@@ -1,3 +1,9 @@
+<p align="center">
+    <a href='https://github.com/Rise-Software/Rise-Media-Player'>
+      <img src="https://github.com/Rise-Software/Rise-Media-Player/assets/74561130/67a1ea8f-1d0f-4c1d-9688-1912ec20f779" alt="RiseMP" />
+    </a>
+</p>
+
 > [!IMPORTANT]
 > After a long period, we're excited to say that Rise Media Player is back!
 > The app is currently undergoing major changes and while contributions are welcome please be aware of merge conflicts.
@@ -108,8 +114,3 @@ Want to contribute to this project? Let us know with an [issue](https://github.c
 
 ---
 
-<p align="center">
-    <a href='https://github.com/Rise-Software/Rise-Media-Player'>
-      <img src="https://github.com/Rise-Software/Rise-Media-Player/assets/74561130/67a1ea8f-1d0f-4c1d-9688-1912ec20f779" alt="RiseMP" />
-    </a>
-</p>
