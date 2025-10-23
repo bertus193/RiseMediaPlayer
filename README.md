@@ -4,14 +4,9 @@
     </a>
 </p>
 
-> [!IMPORTANT]
-> After a long period, we're excited to say that Rise Media Player is back!
-> The app is currently undergoing major changes and while contributions are welcome please be aware of merge conflicts.
+<h1 align="center">Bring your media to a whole new level with Rise Media Player.</h1>
 
 <p align="center">
-    <a href='https://github.com/Rise-Software/Rise-Media-Player'>
-      <img src='https://user-images.githubusercontent.com/74561130/156649276-8dc63e37-bf76-4321-ae7a-4e77f2022c37.png' alt='RiseMP' />
-    </a>
     <a href='https://www.microsoft.com/store/r/9PCSZTMTT55Z'>
       <img src='https://github.com/Rise-Software/Rise-Media-Player/assets/74561130/3d7edcaf-26d8-4453-a751-29b851721abd'alt='Get it from Microsoft' />
     </a>
@@ -20,17 +15,13 @@
     </a>
 </p>
 
-> [!NOTE]
-> The app can only be installed from the store if you are an Insider. To become an insider, [click here](http://bit.ly/rise-insider).
-
-Introducing **Rise Media Player**, a powerful music platform that brings your media to a whole new level.
 If it's videos, music, discs or even your favourite streaming services - you're sure to love our player: with stunning design and an amazing storage layer that gives you the freedom of having one library for all of your content, combined with almost infinite customisability with settings that are second to none.
 Stream, browse and explore - RiseMP can do it all.
 
 Created with **WinUI and the latest design ideologies**, **Rise Media Player** is modern while keeping all of the classic features people need. We use **WinUI 2.8 Preview** to keep our user interface, clean, modern and consistent with **Windows 11 UI and UX** - although, the app does work on **Windows 10** too!
 Our own controls and icons give users a truly personalised experience, being able to choose their own icon packs and with features like compact mode, you can use it on any *Windows device!*
 
-## Features
+## ▶️ Features
 
 * **Music and video playback**: Play music and videos from any source across your device and the internet in high quality
 * **Sorting for songs, albums and videos**: Sort and find any track
@@ -47,12 +38,7 @@ Our own controls and icons give users a truly personalised experience, being abl
 * **Insider exclusives**: Exclusive wallpapers and feature sneak peeks for those enlisted in the programme
 * **Pick up where you left off support**: Support for history and remembering exactly where you were when you last opened the app
 
-<!-- Insider features
-- RiseMP Designed Wallpapers and themes for your desktop
-- Feature sneak peeks
--->
-
-## Downloads
+## ⬇️ Downloads
 
 **If you are an Insider already, just click the Download button and you'll be taken to a page to download 😁**
 In order to learn how to build RiseMP from source, check out [the documentation](./BUILD.md).
@@ -98,19 +84,30 @@ This will be enough to build the app, but if you want last.fm support, you shoul
 
 To build Rise Media Player for development, open the `RiseMP.sln` item in Visual Studio. Right-click on the `Rise.App` packaging project in solution explorer and select ‘Set as Startup item’. Then press <kbd>F5</kbd> or your selected build & deploy keybind to build the app and launch it.
 
-## Contributing
+## 👷‍♂️ Contributing
 
 Want to contribute to this project? Let us know with an [issue](https://github.com/Rise-Software/Rise-Media-Player/issues) that communicates your intent to create a [pull request](https://github.com/Rise-Software/Rise-Media-Player/pulls).
 > [!NOTE]
 > **Looking for a place to start?** Check out [our plan for Beta 1](https://github.com/orgs/Rise-Software/projects/3/views/1), which details planned features and changes..
 
+## 🙏 Huge credits
 
-
-## Credits
-
-* [**Joseph Beattie (@josephbeattie)**](https://github.com/josephbeattie): **Started work on Rise Media Player**
+When I started this work, had very little experience, couldn't have even gotten off the ground properly without these wonderful people: 
 * [**Omar Salas (@YourOrdinaryCat)**](https://github.com/yourordinarycat):
-* [**SimpleBear (@itsWindows11)**](https://github.com/itswindows11): 
+* [**SimpleBear (@itsWindows11)**](https://github.com/itswindows11):
 
----
+And most recently, we've had the wonderful [**Lamparter (@itsWindows11)**](https://github.com/lamparter): doing some great work in getting the project up and running during its development hiatus.
+
+# 🤩 Follow my other projects
+<table style="width: 100%; border: 0;">
+    <tr>
+        <td style="width: 30%; padding-right: 20px; vertical-align: top; border: 0;">
+            <img src="https://github.com/user-attachments/assets/4ce798b2-2e3e-4352-87c0-9859269c2521" width="512" height="512" alt="Descriptive Alt Text" style="width: 100%; border-radius: 8px;">
+        </td>
+        <td style="width: 70%; vertical-align: top;">
+            <h2>Hey! I'm Joseph.</h2>
+            <p>I started work on this app many years ago and hope to restart development soon! Check out  <a href="https://github.com/theimpactfulcompany">THE IMPACTFUL COMPANY</a> for more stuff like this, and feel free to <a href="https://github.com/josephbeattie">give me a follow</a> if you'd like to see what I'm working on privately.</p>
+        </td>
+    </tr>
+</table>
 
