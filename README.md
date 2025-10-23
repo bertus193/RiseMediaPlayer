@@ -4,7 +4,7 @@
     </a>
 </p>
 
-<h1 align="center">Bring your media to a whole new level with Rise Media Player.</h1>
+<h1 align="center">Bring your media to a whole new level.</h1>
 
 <p align="center">
     <a href='https://www.microsoft.com/store/r/9PCSZTMTT55Z'>
