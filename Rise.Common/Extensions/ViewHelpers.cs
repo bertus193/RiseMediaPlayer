@@ -1,61 +1,43 @@
-﻿using Rise.Common.Threading;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.Foundation;
-using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
+using WinRT.Interop;
 
 namespace Rise.Common.Extensions
 {
     public static class ViewHelpers
     {
         /// <summary>
-        /// Creates a new <see cref="ApplicationView"/> which hosts a frame
-        /// that navigates to <typeparamref name="TPage"/> with the provided
-        /// parameter, then shows it.
+        /// Opens a new <see cref="AppWindow"/> hosting a frame
+        /// that navigates to <typeparamref name="TPage"/> with the provided parameter.
         /// </summary>
         public static async Task<bool> OpenViewAsync<TPage>(object parameter = null, Size minSize = default, bool useMinSize = true)
             where TPage : Page
         {
-            var view = await CreateViewAsync<TPage>(parameter);
-            bool shown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(view.Id);
+            var window = new Window();
+            var frame = new Frame();
+            frame.Navigate(typeof(TPage), parameter);
+            window.Content = frame;
 
-            if (shown)
+            var appWindow = GetAppWindow(window);
+            if (appWindow != null && useMinSize && minSize != default)
             {
-                view.SetPreferredMinSize(minSize);
-                if (useMinSize)
-                    _ = view.TryResizeView(minSize);
+                appWindow.Resize(new Windows.Graphics.SizeInt32((int)minSize.Width, (int)minSize.Height));
             }
 
-            return shown;
+            window.Activate();
+            return await Task.FromResult(true);
         }
 
-        /// <summary>
-        /// Creates a new <see cref="ApplicationView"/> which hosts a frame
-        /// that navigates to <typeparamref name="TPage"/> with the provided
-        /// parameter.
-        /// </summary>
-        public static Task<ApplicationView> CreateViewAsync<TPage>(object parameter = null)
-            where TPage : Page
+        private static AppWindow GetAppWindow(Window window)
         {
-            var window = CoreApplication.CreateNewView();
-            var tcs = new TaskCompletionSource<ApplicationView>();
-
-            _ = window.DispatcherQueue.TryEnqueue(() =>
-            {
-                var frame = new Frame();
-                _ = frame.Navigate(typeof(TPage), parameter);
-
-                var curr = Window.Current;
-                curr.Content = frame;
-                curr.Activate();
-
-                tcs.SetResult(ApplicationView.GetForCurrentView());
-            });
-
-            return tcs.Task;
+            var hwnd = WindowNative.GetWindowHandle(window);
+            var wndId = Win32Interop.GetWindowIdFromWindow(hwnd);
+            return AppWindow.GetFromWindowId(wndId);
         }
     }
 }

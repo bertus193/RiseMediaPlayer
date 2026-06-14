@@ -3,7 +3,7 @@ using Rise.App.ViewModels;
 using Rise.Common.Extensions.Markup;
 using System;
 using System.Collections.Generic;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rise.App.Settings
 {
@@ -35,7 +35,7 @@ namespace Rise.App.Settings
                 => string.Format(format, sec);
         }
 
-        private async void OnEqualizerExpanderClick(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void OnEqualizerExpanderClick(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             await new EqualizerDialog().ShowAsync();
         }

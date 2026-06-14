@@ -3,8 +3,8 @@ using Rise.Common.Extensions.Markup;
 using Rise.Data.Navigation;
 using System.Collections.Generic;
 using System.Linq;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rise.App.Settings
 {

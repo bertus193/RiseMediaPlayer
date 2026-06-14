@@ -1,7 +1,7 @@
 ﻿using Rise.Data.Navigation;
 using System;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 
 namespace Rise.App.Converters
 {

@@ -5,10 +5,10 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
+
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace Rise.App.Views
 {
@@ -18,12 +18,12 @@ namespace Rise.App.Views
             => App.MViewModel.PBackend;
 
         private PlaylistViewModel Playlist;
-        private readonly ApplicationView View;
+        
 
         public PlaylistPropertiesPage()
         {
             InitializeComponent();
-            View = ApplicationView.GetForCurrentView();
+            
 
             TitleBar.SetTitleBarForCurrentView();
             Controller.Items.CollectionChanged += OnPlaylistCollectionChanged;
@@ -78,7 +78,7 @@ namespace Rise.App.Views
             await Controller.SaveAsync();
         }
 
-        private async void OnViewConsolidated(ApplicationView sender, ApplicationViewConsolidatedEventArgs args)
+        private void OnWindowClosed(object sender, WindowEventArgs args)
         {
             View.Consolidated -= OnViewConsolidated;
             if (args.IsUserInitiated)

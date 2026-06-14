@@ -1,7 +1,7 @@
 ﻿using Rise.Common.Enums;
 using System;
 using System.Threading.Tasks;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rise.Common.Extensions
 {

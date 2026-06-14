@@ -1,4 +1,4 @@
-﻿using Rise.Common;
+using Rise.Common;
 using Rise.Common.Constants;
 using Rise.Common.Enums;
 using Rise.Common.Extensions;
@@ -58,6 +58,20 @@ namespace Rise.App.ViewModels
         public SafeObservableCollection<VideoViewModel> Videos
             => _videos ??= CreateCollection<Video, VideoViewModel>((v) => new(v));
 
+        // ── Fast-lookup indexes for SaveMusicModelsAsync ─────────────────────
+        // Maintained in parallel with the observable collections.
+        // Keyed by normalised file path (lower-case, forward slashes).
+        // Eliminates the O(n) Songs.Any(s => s.Location == …) scan per file.
+        private readonly HashSet<string> _songLocations  = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _artistNames    = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _albumTitles    = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _genreNames     = new(StringComparer.OrdinalIgnoreCase);
+
+        private static string NormaliseLocation(string path)
+            => path?.Replace('\\', '/').ToLowerInvariant() ?? string.Empty;
+
+        // ── Playlists / Notifications ─────────────────────────────────────────
+
         private JsonBackendController<PlaylistViewModel> _pBackend;
         public JsonBackendController<PlaylistViewModel> PBackend
             => _pBackend ??= JsonBackendController<PlaylistViewModel>.Get("SavedPlaylists");
@@ -70,11 +84,46 @@ namespace Rise.App.ViewModels
         private static SafeObservableCollection<TOutput> CreateCollection<TEntity, TOutput>(Converter<TEntity, TOutput> converter)
             where TEntity : DbObject, new()
         {
-            var items = Repository.GetItems<TEntity>();
-            if (!items.Any())
-                return new();
+            // Return an empty collection immediately so the UI renders without blocking.
+            // PopulateAsync fills it from a background thread and raises CollectionChanged
+            // through SafeObservableCollection's thread-aware dispatcher.
+            var collection = new SafeObservableCollection<TOutput>();
+            _ = PopulateCollectionAsync(collection, converter);
+            return collection;
+        }
 
-            return new(items.ConvertAll(converter));
+        private static async Task PopulateCollectionAsync<TEntity, TOutput>(
+            SafeObservableCollection<TOutput> collection,
+            Converter<TEntity, TOutput> converter)
+            where TEntity : DbObject, new()
+        {
+            var items = await Repository.GetItemsAsync<TEntity>().ConfigureAwait(false);
+            if (items.Count == 0) return;
+
+            // AddRange raises a single Reset notification instead of N Add notifications,
+            // keeping the UI frame budget under control on large libraries.
+            collection.AddRange(items.ConvertAll(converter));
+        }
+
+        /// <summary>
+        /// Seeds the fast-lookup indexes from the already-loaded observable collections.
+        /// Call once after all PopulateCollectionAsync tasks have completed.
+        /// </summary>
+        private void SeedIndexes()
+        {
+            _songLocations.Clear();
+            _artistNames.Clear();
+            _albumTitles.Clear();
+            _genreNames.Clear();
+
+            foreach (var s in Songs)
+                _songLocations.Add(NormaliseLocation(s.Location));
+            foreach (var a in Artists)
+                _artistNames.Add(a.Name ?? string.Empty);
+            foreach (var a in Albums)
+                _albumTitles.Add(a.Title ?? string.Empty);
+            foreach (var g in Genres)
+                _genreNames.Add(g.Name ?? string.Empty);
         }
     }
 
@@ -135,6 +184,10 @@ namespace Rise.App.ViewModels
         {
             IsScanning = true;
             IndexingStarted?.Invoke(this, EventArgs.Empty);
+
+            // Warm up the fast-lookup indexes from collections that were
+            // populated asynchronously at startup before crawling begins.
+            SeedIndexes();
 
             await IndexLibrariesAsync(token).ConfigureAwait(false);
             token.ThrowIfCancellationRequested();
@@ -277,16 +330,18 @@ namespace Rise.App.ViewModels
             var song = await Song.GetFromFileAsync(file, false);
 
             // Check if song exists.
-            bool songExists = Songs.Any(s => s.Model.Equals(song));
+            // O(1) HashSet lookups — replaces O(n) .Any() scans on observable collections.
+            string normLoc = NormaliseLocation(song.Location);
+            bool songExists = _songLocations.Contains(normLoc);
 
             // Check if album exists.
             var album = Albums.FirstOrDefault(a => a.Model.Title == song.Album);
 
             // Check if artist exists.
-            bool artistExists = Artists.Any(a => a.Model.Name == song.Artist);
+            bool artistExists = _artistNames.Contains(song.Artist ?? string.Empty);
 
             // Check if genre exists.
-            bool genreExists = Genres.Any(g => g.Model.Name == song.Genres);
+            bool genreExists = _genreNames.Contains(song.Genres ?? string.Empty);
 
             string albumArtist = song.AlbumArtist.ReplaceIfNullOrWhiteSpace(song.Artist);
 
@@ -362,6 +417,7 @@ namespace Rise.App.ViewModels
                 };
 
                 tasks.Add(arvm.SaveAsync(queue));
+                _artistNames.Add(song.Artist ?? string.Empty);
             }
 
             // Check for the album artist as well.
@@ -389,6 +445,7 @@ namespace Rise.App.ViewModels
                 };
 
                 tasks.Add(gvm.SaveAsync(queue));
+                _genreNames.Add(song.Genres ?? string.Empty);
             }
 
             // If song isn't there already, add it to the database
@@ -396,6 +453,8 @@ namespace Rise.App.ViewModels
             {
                 SongViewModel svm = new(song);
                 tasks.Add(svm.SaveAsync(queue));
+                // Keep indexes in sync
+                _songLocations.Add(normLoc);
             }
 
             await Task.WhenAll(tasks);
@@ -441,6 +500,7 @@ namespace Rise.App.ViewModels
         public async Task RemoveSongAsync(SongViewModel song, bool queue)
         {
             _ = Songs.Remove(song);
+            _songLocations.Remove(NormaliseLocation(song.Location));
             if (queue)
                 _ = Repository.QueueRemove(song.Model);
             else
@@ -583,51 +643,38 @@ namespace Rise.App.ViewModels
         }
 
         /// <summary>
-        /// Checks for duplicates in the music library.
+        /// Checks for duplicates in the music library using O(n) GroupBy
+        /// instead of O(n²) nested loops.
         /// </summary>
         public async Task CheckMusicLibraryDuplicatesAsync()
         {
-            List<SongViewModel> songDuplicates = new();
-            List<ArtistViewModel> artistDuplicates = new();
-            List<AlbumViewModel> albumDuplicates = new();
-            List<GenreViewModel> genreDuplicates = new();
+            // Songs: keep first occurrence per Location, queue-remove the rest
+            var songDuplicates = Songs
+                .GroupBy(s => NormaliseLocation(s.Location))
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.Skip(1))
+                .ToList();
 
-            // Check for duplicates and remove if any duplicate is found.
-            for (int i = 0; i < Songs.Count; i++)
-            {
-                for (int j = i + 1; j < Songs.Count; j++)
-                {
-                    if (Songs[i].Location == Songs[j].Location)
-                        songDuplicates.Add(Songs[j]);
-                }
-            }
+            // Artists: keep first occurrence per Name
+            var artistDuplicates = Artists
+                .GroupBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.Skip(1))
+                .ToList();
 
-            for (int i = 0; i < Artists.Count; i++)
-            {
-                for (int j = i + 1; j < Artists.Count; j++)
-                {
-                    if (Artists[i].Name.Equals(Artists[j].Name))
-                        artistDuplicates.Add(Artists[j]);
-                }
-            }
+            // Albums: keep first occurrence per Title
+            var albumDuplicates = Albums
+                .GroupBy(a => a.Title, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.Skip(1))
+                .ToList();
 
-            for (int i = 0; i < Albums.Count; i++)
-            {
-                for (int j = i + 1; j < Albums.Count; j++)
-                {
-                    if (Albums[i].Title.Equals(Albums[j].Title))
-                        albumDuplicates.Add(Albums[j]);
-                }
-            }
-
-            for (int i = 0; i < Genres.Count; i++)
-            {
-                for (int j = i + 1; j < Genres.Count; j++)
-                {
-                    if (Genres[i].Name.Equals(Genres[j].Name))
-                        genreDuplicates.Add(Genres[j]);
-                }
-            }
+            // Genres: keep first occurrence per Name
+            var genreDuplicates = Genres
+                .GroupBy(g => g.Name, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.Skip(1))
+                .ToList();
 
             foreach (var song in songDuplicates)
                 await RemoveSongAsync(song, true);

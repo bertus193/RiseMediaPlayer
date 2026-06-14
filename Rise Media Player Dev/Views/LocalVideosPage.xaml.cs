@@ -6,8 +6,8 @@ using Rise.Common.Helpers;
 using Rise.Data.Collections;
 using Rise.Data.ViewModels;
 using System;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rise.App.Views
 {
@@ -55,7 +55,7 @@ namespace Rise.App.Views
             if (e.ClickedItem is VideoViewModel video && !KeyboardHelpers.IsCtrlPressed())
             {
                 await MPViewModel.PlaySingleItemAsync(video);
-                if (Window.Current.Content is Frame rootFrame)
+                if (XamlRoot?.Content is Frame rootFrame)
                     rootFrame.Navigate(typeof(NowPlayingPage));
             }
         }

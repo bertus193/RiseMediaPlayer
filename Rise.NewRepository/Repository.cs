@@ -1,4 +1,4 @@
-﻿using Rise.Common.Extensions;
+using Rise.Common.Extensions;
 using Rise.Models;
 using SQLite;
 using System;
@@ -47,6 +47,15 @@ namespace Rise.NewRepository
                 _asyncDb.CreateTableAsync<Genre>(),
                 _asyncDb.CreateTableAsync<Video>()
             );
+
+            // Schema migration: add iTunes statistics columns to existing databases.
+            // sqlite-net CreateTableAsync adds missing columns automatically (MigrateAsync).
+            // For existing installations we do an explicit ALTER TABLE with TryExecuteAsync
+            // as a safety net, since older sqlite-net versions skip column additions silently.
+            await TryAddColumnAsync("Songs", "PlayCount",  "INTEGER NOT NULL DEFAULT 0");
+            await TryAddColumnAsync("Songs", "SkipCount",  "INTEGER NOT NULL DEFAULT 0");
+            await TryAddColumnAsync("Songs", "LastPlayed", "TEXT NULL");
+            await TryAddColumnAsync("Songs", "DateAdded",  "TEXT NULL");
 
             _upsertQueue ??= new();
             _removeQueue ??= new();
@@ -157,6 +166,22 @@ namespace Rise.NewRepository
         /// with the amount of rows that were removed.</returns>
         public static Task<int> DeleteAsync(DbObject item)
             => _asyncDb.DeleteAsync(item);
+
+        /// <summary>
+        /// Tries to add a column to an existing table.
+        /// Silently ignores the error if the column already exists (SQLite error 1 "duplicate column").
+        /// </summary>
+        private static async Task TryAddColumnAsync(string table, string column, string definition)
+        {
+            try
+            {
+                await _asyncDb.ExecuteAsync($"ALTER TABLE {table} ADD COLUMN {column} {definition}");
+            }
+            catch (SQLiteException ex) when (ex.Message.Contains("duplicate column"))
+            {
+                // Column already exists — safe to ignore
+            }
+        }
 
         /// <summary>
         /// Gets the item with the specified Id.

@@ -1,7 +1,10 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Rise.Effects
 {
+    /// <summary>
+    /// Represents a single band in the parametric equalizer.
+    /// </summary>
     public sealed class EqualizerBand : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -12,13 +15,11 @@ namespace Rise.Effects
             get => _index;
             set
             {
-                if (_index != value)
-                {
-                    _index = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Index)));
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HzText)));
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FormattedHz)));
-                }
+                if (_index == value) return;
+                _index = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Index)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HzText)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FormattedHz)));
             }
         }
 
@@ -28,34 +29,26 @@ namespace Rise.Effects
             get => _gain;
             set
             {
-                if (_gain != value)
-                {
-                    _gain = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Gain)));
-                }
+                if (_gain == value) return;
+                _gain = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Gain)));
             }
         }
 
-        public string HzText
+        public string HzText => Index switch
         {
-            get
-            {
-                return Index switch
-                {
-                    0 => "30",
-                    1 => "75",
-                    2 => "150",
-                    3 => "300",
-                    4 => "300",
-                    5 => "1.2k",
-                    6 => "2.5k",
-                    7 => "5k",
-                    8 => "10k",
-                    9 => "20k",
-                    _ => string.Empty,
-                };
-            }
-        }
+            0 => "30",
+            1 => "75",
+            2 => "150",
+            3 => "300",
+            4 => "600",
+            5 => "1.2k",
+            6 => "2.5k",
+            7 => "5k",
+            8 => "10k",
+            9 => "20k",
+            _ => string.Empty,
+        };
 
         public string FormattedHz => $"{HzText}Hz";
 

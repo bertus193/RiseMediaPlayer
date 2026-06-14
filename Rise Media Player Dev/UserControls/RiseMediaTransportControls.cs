@@ -16,9 +16,9 @@ using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Rise.App.UserControls
 {
@@ -368,10 +368,10 @@ namespace Rise.App.UserControls
             base.OnApplyTemplate();
 
             if (GetTemplateChild("OverlayButton") is ButtonBase overlayButton)
-                overlayButton.CommandParameter = ApplicationViewMode.Default;
+                overlayButton.CommandParameter = false;
 
             if (GetTemplateChild("MiniViewButton") is ButtonBase miniButton)
-                miniButton.CommandParameter = ApplicationViewMode.CompactOverlay;
+                miniButton.CommandParameter = true;
 
             if (GetTemplateChild("InfoPropertiesButton") is ButtonBase propertiesButton)
                 propertiesButton.Click += PropertiesButtonClick;
@@ -469,7 +469,7 @@ namespace Rise.App.UserControls
                 var btn = sender as ButtonBase;
 
                 // Retrieve the location of the casting button
-                var transform = btn.TransformToVisual(Window.Current.Content);
+                var transform = btn.TransformToVisual(XamlRoot.Content as UIElement);
                 var pt = transform.TransformPoint(new Point(0, 0));
 
                 // Show the picker above the button
@@ -480,7 +480,7 @@ namespace Rise.App.UserControls
 
         private async void OnCastingDeviceSelected(CastingDevicePicker sender, CastingDeviceSelectedEventArgs args)
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, async () =>
             {
                 var connection = args.SelectedCastingDevice.CreateCastingConnection();
                 await connection.RequestStartCastingAsync(MPViewModel.Player.GetAsCastingSource());

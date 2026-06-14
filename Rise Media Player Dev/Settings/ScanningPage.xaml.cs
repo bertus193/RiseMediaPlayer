@@ -3,8 +3,8 @@ using Rise.App.ViewModels;
 using Rise.Common.Extensions.Markup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 

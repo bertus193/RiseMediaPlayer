@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Rise.App.Helpers;
 using Rise.Common.Constants;
 using Rise.Common.Extensions;
@@ -270,6 +270,79 @@ namespace Rise.App.ViewModels
                     Model.IsLocal = value;
                     OnPropertyChanged();
                 }
+            }
+        }
+
+        // ── iTunes statistics ─────────────────────────────────────────────────
+
+        /// <summary>Total number of times this song has been played.</summary>
+        public int PlayCount
+        {
+            get => Model.PlayCount;
+            set
+            {
+                if (value != Model.PlayCount)
+                {
+                    Model.PlayCount = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>Total number of times this song has been skipped.</summary>
+        public int SkipCount
+        {
+            get => Model.SkipCount;
+            set
+            {
+                if (value != Model.SkipCount)
+                {
+                    Model.SkipCount = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>Last time this song was played. Null if never played.</summary>
+        public DateTime? LastPlayed
+        {
+            get => Model.LastPlayed;
+            set
+            {
+                if (value != Model.LastPlayed)
+                {
+                    Model.LastPlayed = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>Date the song was added to the Rise library.</summary>
+        public DateTime? DateAdded
+        {
+            get => Model.DateAdded;
+            set
+            {
+                if (value != Model.DateAdded)
+                {
+                    Model.DateAdded = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Formatted duration string (m:ss) for display in lists.
+        /// </summary>
+        [JsonIgnore]
+        public string Duration
+        {
+            get
+            {
+                var l = Model.Length;
+                return l.Hours > 0
+                    ? $"{(int)l.TotalHours}:{l.Minutes:D2}:{l.Seconds:D2}"
+                    : $"{l.Minutes}:{l.Seconds:D2}";
             }
         }
 

@@ -3,8 +3,8 @@ using Rise.Common.Extensions;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rise.App.Dialogs
 {
@@ -98,8 +98,8 @@ namespace Rise.App.Dialogs
 
         private void ContentDialog_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            double windowWidth = Window.Current.Bounds.Width;
-            double windowHeight = Window.Current.Bounds.Height;
+            double windowWidth = XamlRoot.Size.Width;
+            double windowHeight = XamlRoot.Size.Height;
 
             RootGrid.Width = windowWidth < 498 ? windowWidth - 68 : 498 - 68;
 

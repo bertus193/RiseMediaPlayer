@@ -8,8 +8,8 @@ using Rise.Data.Json;
 using System;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rise.App.Views
 {

@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="Rise.App.Views.CompactNowPlayingPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,10 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:markup="using:Rise.Common.Extensions.Markup"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:media="using:CommunityToolkit.WinUI.UI.Media"
     xmlns:nouac14="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,14)"
     xmlns:skuc="using:SimpleKit.WindowsRuntime.UI.Controls"
-    xmlns:triggers="using:Microsoft.Toolkit.Uwp.UI.Triggers"
+    xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
     xmlns:uac14="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,14)"
     xmlns:uc="using:Rise.App.UserControls"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"

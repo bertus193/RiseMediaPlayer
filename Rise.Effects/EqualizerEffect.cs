@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.InteropServices.WindowsRuntime;
 using NAudio.Dsp;
 using Rise.Common.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media;
@@ -12,31 +14,45 @@ using Windows.Media.MediaProperties;
 
 namespace Rise.Effects
 {
+    /// <summary>
+    /// A 10-band parametric equalizer implemented as an <see cref="IBasicAudioEffect"/>.
+    /// In WinUI 3 (unpackaged desktop) the class no longer needs to be a WinRT component
+    /// (winmdobj): MediaPlayer accepts any in-process IBasicAudioEffect implementation.
+    /// The singleton <see cref="Current"/> is registered once via
+    /// <c>MediaPlayer.AddVideoEffect / AddAudioEffect</c> from App.xaml.cs.
+    /// </summary>
     public sealed partial class EqualizerEffect : IBasicAudioEffect, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly static Lazy<EqualizerEffect> _current
-            = new Lazy<EqualizerEffect>(() => new EqualizerEffect());
-        /// <summary>
-        /// Gets the current instance of the effect.
-        /// </summary>
+        // ── Singleton ──────────────────────────────────────────────────────────
+
+        private static readonly Lazy<EqualizerEffect> _current
+            = new(() => new EqualizerEffect());
+
+        /// <summary>Gets the process-wide equalizer instance.</summary>
         public static EqualizerEffect Current => _current.Value;
 
-        /// <summary>
-        /// Whether the effect has been initialized.
-        /// </summary>
+        /// <summary>True once <see cref="Current"/> has been accessed.</summary>
         public static bool Initialized => _current.IsValueCreated;
 
+        // ── Bands ──────────────────────────────────────────────────────────────
+
         /// <summary>
-        /// Bands available for the equalizer.
+        /// Observable collection of EQ bands.
+        /// Replaces <c>IObservableVector&lt;EqualizerBand&gt;</c> (WinRT-only type)
+        /// with <see cref="ObservableCollection{T}"/> which is available in all
+        /// .NET targets and still raises CollectionChanged for XAML binding.
         /// </summary>
-        public IObservableVector<EqualizerBand> Bands { get; private set; }
-            = new ObservableVector<EqualizerBand>();
+        public ObservableCollection<EqualizerBand> Bands { get; private set; } = new();
+
+        // ── IsEnabled ──────────────────────────────────────────────────────────
 
         private bool _isEnabled;
+
         /// <summary>
-        /// Whether the effect should be enabled.
+        /// Bypasses DSP processing when false without removing the effect from
+        /// the MediaPlayer chain (MediaPlayer has no remove-effect API).
         /// </summary>
         public bool IsEnabled
         {
@@ -51,183 +67,108 @@ namespace Rise.Effects
             }
         }
 
-        private static List<AudioEncodingProperties> _supportedEncodingProperties;
-        private AudioEncodingProperties currentEncodingProperties;
+        // ── Internal DSP state ─────────────────────────────────────────────────
 
-        private BiQuadFilter[,] filters;
-        private int channels;
-        private int bandCount;
-        private IPropertySet configuration;
+        private static List<AudioEncodingProperties> _supportedEncodingProperties;
+        private AudioEncodingProperties _currentEncodingProperties;
+
+        private BiQuadFilter[,] _filters;
+        private int _channels;
+        private int _bandCount;
+        private IPropertySet _configuration;
+
+        // ── Band initialisation ────────────────────────────────────────────────
 
         /// <summary>
-        /// Initializes the EQ bands with the specified gains.
+        /// Populates <see cref="Bands"/> with default 10-band configuration
+        /// using the supplied gain values.  Gains are normalised so the
+        /// loudest band sits at 0 dB.
         /// </summary>
-        public void InitializeBands([ReadOnlyArray] float[] gains)
+        public void InitializeBands(float[] gains)
         {
             if (Bands.Count > 0)
                 return;
 
-            // Generalize to 0@max
-            var max = float.MinValue;
-            foreach (var gain in gains)
-            {
-                if (gain > max)
-                    max = gain;
-            }
+            float max = float.MinValue;
+            foreach (float g in gains)
+                if (g > max) max = g;
 
-            var bands = new EqualizerBand[]
+            var defs = new (float freq, float bw)[]
             {
-                new EqualizerBand { Index = 0, Bandwidth = 0.8f, Frequency = 30, Gain = gains[0] - max },
-                new EqualizerBand { Index = 1, Bandwidth = 0.8f, Frequency = 75, Gain = gains[1] - max },
-                new EqualizerBand { Index = 2, Bandwidth = 0.8f, Frequency = 150, Gain = gains[2] - max },
-                new EqualizerBand { Index = 3, Bandwidth = 0.8f, Frequency = 30, Gain = gains[3] - max },
-                new EqualizerBand { Index = 4, Bandwidth = 0.8f, Frequency = 600, Gain = gains[4] - max },
-                new EqualizerBand { Index = 5, Bandwidth = 0.8f, Frequency = 1250, Gain = gains[5] - max },
-                new EqualizerBand { Index = 6, Bandwidth = 0.8f, Frequency = 2500, Gain = gains[6] - max },
-                new EqualizerBand { Index = 7, Bandwidth = 0.8f, Frequency = 5000, Gain = gains[7] - max },
-                new EqualizerBand { Index = 8, Bandwidth = 0.8f, Frequency = 10000, Gain = gains[8] - max },
-                new EqualizerBand { Index = 9, Bandwidth = 0.8f, Frequency = 20000, Gain = gains[9] - max },
+                (30,    0.8f),
+                (75,    0.8f),
+                (150,   0.8f),
+                (300,   0.8f),
+                (600,   0.8f),
+                (1250,  0.8f),
+                (2500,  0.8f),
+                (5000,  0.8f),
+                (10000, 0.8f),
+                (20000, 0.8f),
             };
 
-            foreach (var band in bands)
-                Bands.Add(band);
-        }
-
-        /// <summary>
-        /// Recreates the filters for the band at the specified index.
-        /// </summary>
-        public void UpdateBand(int index)
-        {
-            var band = Bands[index];
-            for (int n = 0; n < channels; n++)
+            for (int i = 0; i < defs.Length; i++)
             {
-                if (filters[n, index] == null)
-                    filters[n, index] = BiQuadFilter.PeakingEQ(currentEncodingProperties.SampleRate, band.Frequency, band.Bandwidth, band.Gain);
-                else
-                    filters[n, index].SetPeakingEq(currentEncodingProperties.SampleRate, band.Frequency, band.Bandwidth, band.Gain);
+                Bands.Add(new EqualizerBand
+                {
+                    Index = i,
+                    Frequency = defs[i].freq,
+                    Bandwidth = defs[i].bw,
+                    Gain = gains[i] - max,
+                });
             }
         }
 
-        /// <summary>
-        /// Recreates the filters for every band.
-        /// </summary>
+        // ── Filter management ──────────────────────────────────────────────────
+
+        /// <summary>Rebuilds the BiQuad filters for a single band.</summary>
+        public void UpdateBand(int index)
+        {
+            if (_filters == null) return;
+            var band = Bands[index];
+            for (int ch = 0; ch < _channels; ch++)
+            {
+                if (_filters[ch, index] == null)
+                    _filters[ch, index] = BiQuadFilter.PeakingEQ(
+                        _currentEncodingProperties.SampleRate,
+                        band.Frequency, band.Bandwidth, band.Gain);
+                else
+                    _filters[ch, index].SetPeakingEq(
+                        _currentEncodingProperties.SampleRate,
+                        band.Frequency, band.Bandwidth, band.Gain);
+            }
+        }
+
+        /// <summary>Rebuilds the BiQuad filters for every band.</summary>
         public void UpdateAllBands()
         {
-            for (int i = 0; i < bandCount; i++)
+            for (int i = 0; i < _bandCount; i++)
                 UpdateBand(i);
         }
 
-        private void SetEncodingPropertiesImpl(AudioEncodingProperties encodingProperties)
-        {
-            currentEncodingProperties = encodingProperties;
+        // ── IBasicAudioEffect implementation ───────────────────────────────────
 
-            if (channels != (int)currentEncodingProperties.ChannelCount || bandCount != Bands.Count)
-            {
-                channels = (int)currentEncodingProperties.ChannelCount;
-                bandCount = Bands.Count;
-
-                filters = new BiQuadFilter[channels, bandCount];
-            }
-
-            UpdateAllBands();
-        }
-
-        private void ProcessFrameImpl(ProcessAudioFrameContext context)
-        {
-            // Check if we don't have the effect enabled in the configuration.
-            // This is a workaround for the fact that MediaPlayer does not
-            // have a way to remove/disable the effect.
-            if (!IsEnabled)
-                return;
-
-            unsafe
-            {
-                AudioFrame inputFrame = context.InputFrame;
-
-                using (AudioBuffer inputBuffer = inputFrame.LockBuffer(AudioBufferAccessMode.ReadWrite))
-                using (IMemoryBufferReference inputReference = inputBuffer.CreateReference())
-                {
-                    ((IMemoryBufferByteAccess)inputReference).GetBuffer(out byte* inputDataInBytes, out uint inputCapacity);
-
-                    float* inputDataInFloat = (float*)inputDataInBytes;
-                    int dataInFloatLength = (int)inputBuffer.Length / sizeof(float);
-
-                    // Process audio data
-                    for (int n = 0; n < dataInFloatLength; n++)
-                    {
-                        int ch = n % channels;
-
-                        // Cascaded filter to perform EQ
-                        for (int band = 0; band < bandCount; band++)
-                        {
-                            inputDataInFloat[n] = filters[ch, band].Transform(inputDataInFloat[n]);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void CloseImpl(MediaEffectClosedReason reason)
-        {
-            switch (reason)
-            {
-                case MediaEffectClosedReason.Done:
-                case MediaEffectClosedReason.UnknownError:
-                case MediaEffectClosedReason.UnsupportedEncodingFormat:
-                default:
-                    break;
-                case MediaEffectClosedReason.EffectCurrentlyUnloaded:
-                    if (filters != null)
-                        for (int i = 0; i < filters.Rank; i++)
-                        {
-                            for (int j = 0; j < filters.GetLength(i); j++)
-                            {
-                                filters[i, j] = null;
-                            }
-                        }
-                    channels = 0;
-                    bandCount = 0;
-                    filters = null;
-                    break;
-            }
-        }
-    }
-
-    // IBasicAudioEffect
-    public sealed partial class EqualizerEffect : IBasicAudioEffect
-    {
         public bool UseInputFrameForOutput => true;
 
         public IReadOnlyList<AudioEncodingProperties> SupportedEncodingProperties
         {
             get
             {
-                if (_supportedEncodingProperties == null)
+                if (_supportedEncodingProperties != null)
+                    return _supportedEncodingProperties;
+
+                _supportedEncodingProperties = new List<AudioEncodingProperties>();
+
+                void Add(uint sampleRate, uint channels)
                 {
-                    _supportedEncodingProperties = new List<AudioEncodingProperties>();
-
-                    AudioEncodingProperties encodingProps1 = AudioEncodingProperties.CreatePcm(44100, 1, 32);
-                    encodingProps1.Subtype = MediaEncodingSubtypes.Float;
-                    AudioEncodingProperties encodingProps2 = AudioEncodingProperties.CreatePcm(48000, 1, 32);
-                    encodingProps2.Subtype = MediaEncodingSubtypes.Float;
-
-                    AudioEncodingProperties encodingProps3 = AudioEncodingProperties.CreatePcm(44100, 2, 32);
-                    encodingProps3.Subtype = MediaEncodingSubtypes.Float;
-                    AudioEncodingProperties encodingProps4 = AudioEncodingProperties.CreatePcm(48000, 2, 32);
-                    encodingProps4.Subtype = MediaEncodingSubtypes.Float;
-
-                    AudioEncodingProperties encodingProps5 = AudioEncodingProperties.CreatePcm(96000, 2, 32);
-                    encodingProps5.Subtype = MediaEncodingSubtypes.Float;
-                    AudioEncodingProperties encodingProps6 = AudioEncodingProperties.CreatePcm(192000, 2, 32);
-                    encodingProps6.Subtype = MediaEncodingSubtypes.Float;
-
-                    _supportedEncodingProperties.Add(encodingProps1);
-                    _supportedEncodingProperties.Add(encodingProps2);
-                    _supportedEncodingProperties.Add(encodingProps3);
-                    _supportedEncodingProperties.Add(encodingProps4);
-                    _supportedEncodingProperties.Add(encodingProps5);
-                    _supportedEncodingProperties.Add(encodingProps6);
+                    var p = AudioEncodingProperties.CreatePcm(sampleRate, channels, 32);
+                    p.Subtype = MediaEncodingSubtypes.Float;
+                    _supportedEncodingProperties.Add(p);
                 }
+
+                Add(44100, 1); Add(48000, 1);
+                Add(44100, 2); Add(48000, 2);
+                Add(96000, 2); Add(192000, 2);
 
                 return _supportedEncodingProperties;
             }
@@ -235,27 +176,62 @@ namespace Rise.Effects
 
         public void SetEncodingProperties(AudioEncodingProperties encodingProperties)
         {
-            Current?.SetEncodingPropertiesImpl(encodingProperties);
+            _currentEncodingProperties = encodingProperties;
+
+            if (_channels != (int)encodingProperties.ChannelCount || _bandCount != Bands.Count)
+            {
+                _channels = (int)encodingProperties.ChannelCount;
+                _bandCount = Bands.Count;
+                _filters = new BiQuadFilter[_channels, _bandCount];
+            }
+
+            UpdateAllBands();
         }
 
         public void ProcessFrame(ProcessAudioFrameContext context)
         {
-            Current?.ProcessFrameImpl(context);
+            if (!IsEnabled) return;
+
+            unsafe
+            {
+                using AudioBuffer inputBuffer = context.InputFrame.LockBuffer(AudioBufferAccessMode.ReadWrite);
+                using IMemoryBufferReference inputReference = inputBuffer.CreateReference();
+
+                ((IMemoryBufferByteAccess)inputReference).GetBuffer(
+                    out byte* inputDataInBytes, out _);
+
+                float* inputDataInFloat = (float*)inputDataInBytes;
+                int dataInFloatLength = (int)inputBuffer.Length / sizeof(float);
+
+                for (int n = 0; n < dataInFloatLength; n++)
+                {
+                    int ch = n % _channels;
+                    for (int band = 0; band < _bandCount; band++)
+                        inputDataInFloat[n] = _filters[ch, band].Transform(inputDataInFloat[n]);
+                }
+            }
         }
 
-        public void DiscardQueuedFrames()
-        {
-        }
+        public void DiscardQueuedFrames() { }
 
         public void Close(MediaEffectClosedReason reason)
         {
-            Current?.CloseImpl(reason);
+            if (reason != MediaEffectClosedReason.EffectCurrentlyUnloaded)
+                return;
+
+            if (_filters != null)
+            {
+                for (int i = 0; i < _channels; i++)
+                    for (int j = 0; j < _bandCount; j++)
+                        _filters[i, j] = null;
+            }
+
+            _channels = 0;
+            _bandCount = 0;
+            _filters = null;
         }
 
         public void SetProperties(IPropertySet configuration)
-        {
-            if (Current != null)
-                Current.configuration = configuration;
-        }
+            => _configuration = configuration;
     }
 }

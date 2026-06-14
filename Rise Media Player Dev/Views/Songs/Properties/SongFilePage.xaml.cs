@@ -3,8 +3,8 @@ using System;
 using System.Diagnostics;
 using Windows.Storage;
 using Windows.System;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace Rise.App.Views
 {
@@ -27,7 +27,7 @@ namespace Rise.App.Views
             base.OnNavigatedTo(e);
         }
 
-        private async void OpenFileLocation_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void OpenFileLocation_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             _ = await Launcher.LaunchFolderPathAsync(Props.Location.Replace(Props.Filename, string.Empty));
         }

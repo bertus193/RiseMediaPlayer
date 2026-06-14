@@ -9,7 +9,7 @@
     xmlns:storage="using:Windows.Storage"
     xmlns:uc="using:Rise.App.UserControls"
     xmlns:labs="using:CommunityToolkit.Labs.WinUI"
-    xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:ui="using:CommunityToolkit.WinUI.UI"
     mc:Ignorable="d">
 
     <Page.Resources>

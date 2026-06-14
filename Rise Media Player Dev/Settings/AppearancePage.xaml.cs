@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using Windows.ApplicationModel.Core;
 using Windows.UI;
 using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rise.App.Settings
 {
@@ -161,6 +161,6 @@ namespace Rise.App.Settings
         }
 
         private async void ChangeThemeTip_ActionButtonClick(Microsoft.UI.Xaml.Controls.TeachingTip sender, object args)
-            => _ = await CoreApplication.RequestRestartAsync("ThemeChanged");
+            => _ = await Microsoft.Windows.AppLifecycle.AppInstance.Restart("ThemeChanged");
     }
 }

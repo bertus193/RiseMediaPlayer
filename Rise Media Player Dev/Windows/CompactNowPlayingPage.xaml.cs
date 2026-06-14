@@ -1,17 +1,14 @@
-﻿using Rise.Common.Threading;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
 using Rise.Data.ViewModels;
-using System;
 using System.Threading.Tasks;
-using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media.Animation;
 
 namespace Rise.App.Views
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// Compact Overlay (picture-in-picture) now playing page.
     /// </summary>
     public sealed partial class CompactNowPlayingPage : Page
     {
@@ -20,49 +17,49 @@ namespace Rise.App.Views
         public CompactNowPlayingPage()
         {
             InitializeComponent();
-            TitleBar.SetTitleBarForCurrentView();
+
+            // Register TitleBar as drag region for this window
+            App.MainAppWindow.SetTitleBarElement(TitleBar);
 
             _ = VisualStateManager.GoToState(this, nameof(PointerOutState), false);
         }
 
         private void OnPlayerLoaded(object sender, RoutedEventArgs e)
-        {
-            MainPlayer.SetMediaPlayer(MPViewModel.Player);
-        }
+            => MainPlayer.SetMediaPlayer(MPViewModel.Player);
 
         private void OnPageUnloaded(object sender, RoutedEventArgs e)
-        {
-            MainPlayer.SetMediaPlayer(null);
-        }
+            => MainPlayer.SetMediaPlayer(null);
 
-        public static async Task NavigateAsync(Frame frame)
+        /// <summary>
+        /// Enters Compact Overlay mode and navigates to this page.
+        /// Replaces ApplicationView.TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay).
+        /// </summary>
+        public static Task NavigateAsync(Frame frame)
         {
-            _ = await ApplicationView.GetForCurrentView().
-                TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay);
+            // WinUI 3: set CompactOverlay presenter on the AppWindow
+            App.MainAppWindow.EnterCompactOverlay();
 
-            _ = frame.Navigate(typeof(CompactNowPlayingPage), null, new SuppressNavigationTransitionInfo());
+            _ = frame.Navigate(typeof(CompactNowPlayingPage), null,
+                new SuppressNavigationTransitionInfo());
+
+            return Task.CompletedTask;
         }
     }
 
     // Event handlers
     public sealed partial class CompactNowPlayingPage
     {
-        private async void OnExitButtonClick(object sender, RoutedEventArgs e)
+        private void OnExitButtonClick(object sender, RoutedEventArgs e)
         {
-            _ = await ApplicationView.GetForCurrentView().
-                TryEnterViewModeAsync(ApplicationViewMode.Default);
-
+            // WinUI 3: restore default windowed presenter
+            App.MainAppWindow.ExitCompactOverlay();
             Frame.GoBack();
         }
 
         private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            _ = VisualStateManager.GoToState(this, nameof(PointerInState), true);
-        }
+            => _ = VisualStateManager.GoToState(this, nameof(PointerInState), true);
 
         private void OnPointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            _ = VisualStateManager.GoToState(this, nameof(PointerOutState), true);
-        }
+            => _ = VisualStateManager.GoToState(this, nameof(PointerOutState), true);
     }
 }

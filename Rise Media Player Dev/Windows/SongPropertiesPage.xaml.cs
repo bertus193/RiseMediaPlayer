@@ -3,9 +3,9 @@ using Rise.Common.Extensions;
 using System;
 using System.Threading.Tasks;
 using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace Rise.App.Views
 {
@@ -31,7 +31,7 @@ namespace Rise.App.Views
         }
 
         private async void CancelButton_Click(object sender, RoutedEventArgs e)
-            => _ = await ApplicationView.GetForCurrentView().TryConsolidateAsync();
+            => App.MainAppWindow.Close();
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -39,7 +39,7 @@ namespace Rise.App.Views
 
             if (result)
             {
-                _ = await ApplicationView.GetForCurrentView().TryConsolidateAsync();
+                App.MainAppWindow.Close();
                 return;
             }
 

@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local1="using:Rise.App"
     xmlns:markup="using:Rise.Common.Extensions.Markup"
-    xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:ui="using:CommunityToolkit.WinUI.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:uc="using:Rise.App.UserControls" xmlns:labs="using:CommunityToolkit.Labs.WinUI"
     mc:Ignorable="d">

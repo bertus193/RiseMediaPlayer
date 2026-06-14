@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -959,5 +959,12 @@ https://www.youtube.com/watch?v=p7YXXieghto</value>
   <data name="AspectRatio" xml:space="preserve">
     <value>Aspect Ratio</value>
     <comment>Aspect Ratio option in the now playing bar.</comment>
+  </data>
+
+  <data name="ITunesMigration" xml:space="preserve">
+    <value>iTunes Migration</value>
+  </data>
+  <data name="ITunesMigrationDesc" xml:space="preserve">
+    <value>Import your iTunes library, play counts, ratings and playlists into Rise</value>
   </data>
 </root>

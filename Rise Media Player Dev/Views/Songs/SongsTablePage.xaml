@@ -1,0 +1,204 @@
+<uc:MediaPageBase
+    x:Class="Rise.App.Views.SongsTablePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:collections="using:Rise.Data.Collections"
+    xmlns:conv="using:Rise.App.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:markup="using:Rise.Common.Extensions.Markup"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:uc="using:Rise.App.UserControls"
+    xmlns:viewmodels="using:Rise.App.ViewModels"
+    x:Name="PageRoot"
+    d:Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+
+    <uc:MediaPageBase.Resources>
+        <conv:BooleanToVisibility x:Key="BoolToVis" />
+        <conv:NullToBoolean       x:Key="NullToBool" />
+    </uc:MediaPageBase.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Title + CommandBar -->
+        <StackPanel Padding="56,52,56,0" Spacing="4">
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}"
+                       Text="{markup:ResourceHelper Name=Songs}" />
+            <CommandBar Margin="-12,0" HorizontalAlignment="Left"
+                        Background="Transparent" DefaultLabelPosition="Right">
+                <AppBarButton Command="{x:Bind MediaViewModel.PlayFromItemCommand}"
+                              CommandParameter="{x:Bind SelectedItem, Mode=OneWay}"
+                              Icon="Play" Style="{StaticResource AppBarButtonCompactStyle}"
+                              ToolTipService.ToolTip="{markup:ResourceHelper Name=Play}" />
+                <AppBarSeparator />
+                <AppBarButton Command="{x:Bind MediaViewModel.ShuffleFromItemCommand}"
+                              CommandParameter="{x:Bind SelectedItem, Mode=OneWay}"
+                              Icon="Shuffle" Label="{markup:ResourceHelper Name=Shuffle}" />
+                <AppBarButton IsEnabled="{x:Bind SelectedItem, Converter={StaticResource NullToBool}, Mode=OneWay}"
+                              Label="{markup:ResourceHelper Name=AddTo}">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xECC8;" /></AppBarButton.Icon>
+                    <AppBarButton.Flyout>
+                        <MenuFlyout x:Name="AddToBar" />
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarSeparator />
+                <AppBarButton Click="Remove_Click" Icon="Delete"
+                              IsEnabled="{x:Bind SelectedItem, Converter={StaticResource NullToBool}, Mode=OneWay}"
+                              Style="{StaticResource AppBarButtonCompactStyle}" />
+                <AppBarButton Command="{x:Bind EditItemCommand}"
+                              CommandParameter="{x:Bind SelectedItem, Mode=OneWay}"
+                              Icon="Edit"
+                              IsEnabled="{x:Bind SelectedItem, Converter={StaticResource NullToBool}, Mode=OneWay}"
+                              Style="{StaticResource AppBarButtonCompactStyle}" />
+                <AppBarSeparator />
+                <!-- Column picker -->
+                <AppBarButton Label="{markup:ResourceHelper Name=View}">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xECAA;" /></AppBarButton.Icon>
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowAlbum,      Mode=TwoWay}" Text="{markup:ResourceHelper Name=Album}" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowArtist,     Mode=TwoWay}" Text="{markup:ResourceHelper Name=ArtistOrArtists}" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowAlbumArtist,Mode=TwoWay}" Text="Album Artist" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowPlayCount,  Mode=TwoWay}" Text="Play Count" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowSkipCount,  Mode=TwoWay}" Text="Skip Count" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowRating,     Mode=TwoWay}" Text="{markup:ResourceHelper Name=Rating}" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowYear,       Mode=TwoWay}" Text="{markup:ResourceHelper Name=ReleaseYear}" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowDuration,   Mode=TwoWay}" Text="{markup:ResourceHelper Name=Duration}" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowDateAdded,  Mode=TwoWay}" Text="Date Added" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowLastPlayed, Mode=TwoWay}" Text="Last Played" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind ShowBitrate,    Mode=TwoWay}" Text="Bitrate" />
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <!-- Sort -->
+                <AppBarButton Icon="Sort" Label="{markup:ResourceHelper Name=Sort}">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="GSongTitle|SongTitle"     Text="{markup:ResourceHelper Name=Title}" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="GSongAlbum|SongDisc|SongTrack" Text="{markup:ResourceHelper Name=Album}" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="GSongArtist"              Text="{markup:ResourceHelper Name=ArtistOrArtists}" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="GSongAlbumArtist"         Text="Album Artist" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="GSongGenres"              Text="{markup:ResourceHelper Name=Genre}" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="GSongYear"                Text="{markup:ResourceHelper Name=ReleaseYear}" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="SongDuration"             Text="{markup:ResourceHelper Name=Duration}" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="SongBitrate"              Text="Bitrate" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="SongPlayCount"            Text="Play Count" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="SongSkipCount"            Text="Skip Count" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="SongRating"               Text="{markup:ResourceHelper Name=Rating}" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="SongDateAdded"            Text="Date Added" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortCol" Command="{x:Bind SortCommand}" CommandParameter="SongLastPlayed"           Text="Last Played" />
+                            <MenuFlyoutSeparator />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortDir" Command="{x:Bind MediaViewModel.UpdateSortDirectionCommand}" CommandParameter="{x:Bind collections:SortDirection.Ascending}"  Text="{markup:ResourceHelper Name=Ascending}" />
+                            <muxc:RadioMenuFlyoutItem GroupName="SortDir" Command="{x:Bind MediaViewModel.UpdateSortDirectionCommand}" CommandParameter="{x:Bind collections:SortDirection.Descending}" Text="{markup:ResourceHelper Name=Descending}" />
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </CommandBar>
+        </StackPanel>
+
+        <!-- Column headers (sticky) -->
+        <Border Grid.Row="1"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="0,1,0,1">
+            <Grid Padding="56,0" ColumnSpacing="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="36" />
+                    <ColumnDefinition Width="36" />
+                    <ColumnDefinition Width="*" MinWidth="140" />
+                    <ColumnDefinition Width="160" />
+                    <ColumnDefinition Width="140" />
+                    <ColumnDefinition Width="140" />
+                    <ColumnDefinition Width="80"  />
+                    <ColumnDefinition Width="72"  />
+                    <ColumnDefinition Width="80"  />
+                    <ColumnDefinition Width="60"  />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="72"  />
+                    <ColumnDefinition Width="72"  />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Padding="0,6" HorizontalAlignment="Center"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="#" />
+                <!-- Each header is a Button so it's keyboard-accessible and shows hover state -->
+                <Button Grid.Column="2"  x:Name="HdrTitle"       Click="Hdr_Click" Tag="GSongTitle|SongTitle"             Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{markup:ResourceHelper Name=Title}" /></Button>
+                <Button Grid.Column="3"  x:Name="HdrAlbum"       Click="Hdr_Click" Tag="GSongAlbum|SongDisc|SongTrack"    Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch" Visibility="{x:Bind ShowAlbum,       Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{markup:ResourceHelper Name=Album}" /></Button>
+                <Button Grid.Column="4"  x:Name="HdrArtist"      Click="Hdr_Click" Tag="GSongArtist"                      Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch" Visibility="{x:Bind ShowArtist,      Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{markup:ResourceHelper Name=ArtistOrArtists}" /></Button>
+                <Button Grid.Column="5"  x:Name="HdrAlbumArtist" Click="Hdr_Click" Tag="GSongAlbumArtist"                 Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch" Visibility="{x:Bind ShowAlbumArtist, Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Album Artist" /></Button>
+                <Button Grid.Column="6"  x:Name="HdrPlayCount"   Click="Hdr_Click" Tag="SongPlayCount"                    Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch" Visibility="{x:Bind ShowPlayCount,   Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Plays" /></Button>
+                <Button Grid.Column="7"  x:Name="HdrSkipCount"   Click="Hdr_Click" Tag="SongSkipCount"                    Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch" Visibility="{x:Bind ShowSkipCount,   Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Skips" /></Button>
+                <Button Grid.Column="8"  x:Name="HdrRating"      Click="Hdr_Click" Tag="SongRating"                       Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch" Visibility="{x:Bind ShowRating,      Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{markup:ResourceHelper Name=Rating}" /></Button>
+                <Button Grid.Column="9"  x:Name="HdrYear"        Click="Hdr_Click" Tag="GSongYear"                        Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Center"  Visibility="{x:Bind ShowYear,        Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{markup:ResourceHelper Name=ReleaseYear}" /></Button>
+                <Button Grid.Column="10" x:Name="HdrDateAdded"   Click="Hdr_Click" Tag="SongDateAdded"                    Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch" Visibility="{x:Bind ShowDateAdded,   Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Date Added" /></Button>
+                <Button Grid.Column="11" x:Name="HdrLastPlayed"  Click="Hdr_Click" Tag="SongLastPlayed"                   Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch" Visibility="{x:Bind ShowLastPlayed,  Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Last Played" /></Button>
+                <Button Grid.Column="12" x:Name="HdrBitrate"     Click="Hdr_Click" Tag="SongBitrate"                      Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Stretch" Visibility="{x:Bind ShowBitrate,     Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Bitrate" /></Button>
+                <Button Grid.Column="13" x:Name="HdrDuration"    Click="Hdr_Click" Tag="SongDuration"                     Style="{StaticResource TransparentButtonStyle}" HorizontalAlignment="Right"   Visibility="{x:Bind ShowDuration,    Converter={StaticResource BoolToVis}, Mode=OneWay}"><TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{markup:ResourceHelper Name=Duration}" /></Button>
+            </Grid>
+        </Border>
+
+        <!-- Song rows -->
+        <ListView x:Name="MainList" Grid.Row="2"
+                  Padding="56,0,56,120"
+                  DoubleTapped="MainList_DoubleTapped"
+                  IsDoubleTapEnabled="True"
+                  ItemContainerStyle="{StaticResource SongListViewItemStyle}"
+                  ItemsSource="{x:Bind MediaViewModel.Items}"
+                  SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
+                  SelectionMode="Single">
+            <ListView.ContextFlyout>
+                <MenuFlyout Opening="MenuFlyout_Opening">
+                    <MenuFlyoutItem Command="{x:Bind MediaViewModel.PlayFromItemCommand}" CommandParameter="{x:Bind SelectedItem, Mode=OneWay}" Icon="Play" Text="{markup:ResourceHelper Name=Play}" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutSubItem x:Name="AddTo" Text="{markup:ResourceHelper Name=AddTo}" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Click="Remove_Click" Icon="Delete" Text="{markup:ResourceHelper Name=RemoveThing}" />
+                    <MenuFlyoutItem Command="{x:Bind EditItemCommand}" CommandParameter="{x:Bind SelectedItem, Mode=OneWay}" Icon="Edit" Text="{markup:ResourceHelper Name=PropertiesInfo}" />
+                </MenuFlyout>
+            </ListView.ContextFlyout>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:SongViewModel">
+                    <uc:SongTableRow
+                        MaxPlayCount="{Binding MaxPlayCount,    ElementName=PageRoot}"
+                        PlayCommand="{Binding MediaViewModel.PlayFromItemCommand, ElementName=PageRoot}"
+                        ShowAlbum="{Binding ShowAlbum,          ElementName=PageRoot, Mode=OneWay}"
+                        ShowAlbumArtist="{Binding ShowAlbumArtist, ElementName=PageRoot, Mode=OneWay}"
+                        ShowArtist="{Binding ShowArtist,        ElementName=PageRoot, Mode=OneWay}"
+                        ShowBitrate="{Binding ShowBitrate,      ElementName=PageRoot, Mode=OneWay}"
+                        ShowDateAdded="{Binding ShowDateAdded,  ElementName=PageRoot, Mode=OneWay}"
+                        ShowDuration="{Binding ShowDuration,    ElementName=PageRoot, Mode=OneWay}"
+                        ShowInlineArtist="{Binding ShowInlineArtist, ElementName=PageRoot, Mode=OneWay}"
+                        ShowLastPlayed="{Binding ShowLastPlayed,ElementName=PageRoot, Mode=OneWay}"
+                        ShowPlayCount="{Binding ShowPlayCount,  ElementName=PageRoot, Mode=OneWay}"
+                        ShowRating="{Binding ShowRating,        ElementName=PageRoot, Mode=OneWay}"
+                        ShowSkipCount="{Binding ShowSkipCount,  ElementName=PageRoot, Mode=OneWay}"
+                        ShowYear="{Binding ShowYear,            ElementName=PageRoot, Mode=OneWay}"
+                        Song="{x:Bind}"
+                        TrackNumber="{x:Bind Track}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- Status bar -->
+        <Border Grid.Row="3"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="0,1,0,0" Padding="56,6">
+            <Grid>
+                <TextBlock x:Name="StatusText"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Style="{StaticResource CaptionTextBlockStyle}" />
+                <TextBlock x:Name="SortIndicator" HorizontalAlignment="Right"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Style="{StaticResource CaptionTextBlockStyle}" />
+            </Grid>
+        </Border>
+    </Grid>
+</uc:MediaPageBase>

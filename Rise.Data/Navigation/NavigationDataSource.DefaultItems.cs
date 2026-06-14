@@ -71,6 +71,22 @@ namespace Rise.Data.Navigation
                 AccessKey = "L",
                 FlyoutId = "RemoveItemFlyout"
             }
+
+
+            new NavigationItemHeader()
+            {
+                Id = "ITunesSyncGroup",
+                Group = "ITunesSyncGroup",
+                Label = "iTunes"
+            },
+            new NavigationItemDestination()
+            {
+                Id = "ITunesMigrationPage",
+                Group = "ITunesSyncGroup",
+                DefaultIcon = "\uEA69",
+                Label = "ITunesMigration",
+                AccessKey = "I"
+            }
         };
     }
 }

@@ -4,7 +4,7 @@ using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
 using Windows.Storage.Streams;
-using Windows.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Buffer = Windows.Storage.Streams.Buffer;
 
 namespace Rise.Common.Extensions

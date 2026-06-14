@@ -2,7 +2,7 @@
 using Rise.App.ViewModels;
 using Rise.Common.Helpers;
 using Rise.Data.Collections;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rise.App.Views
 {

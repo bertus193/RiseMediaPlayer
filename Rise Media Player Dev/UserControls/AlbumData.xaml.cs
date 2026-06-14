@@ -1,8 +1,8 @@
 ﻿using Rise.App.ViewModels;
 using Rise.Common.Enums;
 using System.Windows.Input;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rise.App.UserControls
 {

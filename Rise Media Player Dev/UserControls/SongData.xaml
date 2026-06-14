@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="Rise.App.UserControls.SongData"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -7,8 +7,8 @@
     xmlns:helpers="using:Rise.Common.Helpers"
     xmlns:markup="using:Rise.Common.Extensions.Markup"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:tkitctrls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:ui="using:Microsoft.Toolkit.Uwp.UI.Triggers"
+    xmlns:tkitctrls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI.UI.Triggers"
     d:DesignHeight="64"
     d:DesignWidth="600"
     PointerEntered="OnPointerEntered"

@@ -5,10 +5,10 @@ using Rise.Common.Extensions.Markup;
 using System;
 using System.Threading.Tasks;
 using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 
 namespace Rise.App.Dialogs
 {
@@ -111,20 +111,20 @@ namespace Rise.App.Dialogs
 
             if (closeApp)
             {
-                _ = await ApplicationView.GetForCurrentView().TryConsolidateAsync();
+                App.MainAppWindow.Close();
             }
             else
             {
                 HideDialog();
 
-                var rootFrame = Window.Current.Content as Frame;
+                var rootFrame = XamlRoot?.Content as Frame;
                 _ = rootFrame.Navigate(typeof(MainPage));
             }
         }
 
         private void HideDialog()
         {
-            var popups = VisualTreeHelper.GetOpenPopups(Window.Current);
+            var popups = VisualTreeHelper.GetOpenPopupsForXamlRoot(XamlRoot);
             foreach (var popup in popups)
             {
                 if (popup.Child is ContentDialog dialog)

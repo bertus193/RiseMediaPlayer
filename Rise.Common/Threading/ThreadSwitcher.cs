@@ -1,23 +1,22 @@
-﻿using System.ComponentModel;
+using Microsoft.UI.Dispatching;
+using System.ComponentModel;
 using Windows.System.Threading;
-using Windows.UI.Core;
 
 namespace Rise.Common.Threading
 {
     /// <summary>
     /// A helper class that provides awaiters for multiple WinRT
-    /// objects.
+    /// and WinUI 3 dispatcher objects.
     /// </summary>
     public static class ThreadSwitcher
     {
-        public static CoreDispatcherAwaiter ResumeForegroundAsync(CoreDispatcher dispatcher)
+        public static DispatcherQueueAwaiter ResumeForegroundAsync(DispatcherQueue dispatcher)
             => new(dispatcher);
 
         /// <summary>
         /// Configures a dispatcher awaiter with the provided priority.
         /// </summary>
-        /// <returns>The configured awaiter.</returns>
-        public static ConfiguredCoreDispatcherAwaiter ConfigureAwait(this CoreDispatcher dispatcher, CoreDispatcherPriority priority)
+        public static ConfiguredDispatcherQueueAwaiter ConfigureAwait(this DispatcherQueue dispatcher, DispatcherQueuePriority priority)
             => new(dispatcher, priority);
 
         public static ThreadPoolAwaiter ResumeBackgroundAsync()
@@ -26,19 +25,17 @@ namespace Rise.Common.Threading
         /// <summary>
         /// Configures the awaiter with the provided priority.
         /// </summary>
-        /// <returns>The configured awaiter.</returns>
         public static ConfiguredThreadPoolAwaiter ResumeBackgroundAsync(WorkItemPriority priority)
             => new(priority, WorkItemOptions.None);
 
         /// <summary>
         /// Configures the awaiter with the provided priority and options.
         /// </summary>
-        /// <returns>The configured awaiter.</returns>
         public static ConfiguredThreadPoolAwaiter ResumeBackgroundAsync(WorkItemPriority priority, WorkItemOptions options)
             => new(priority, options);
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static CoreDispatcherAwaiter GetAwaiter(this CoreDispatcher dispatcher)
+        public static DispatcherQueueAwaiter GetAwaiter(this DispatcherQueue dispatcher)
             => new(dispatcher);
     }
 }

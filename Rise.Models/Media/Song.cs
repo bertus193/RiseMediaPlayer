@@ -1,4 +1,4 @@
-﻿using Rise.Common.Constants;
+using Rise.Common.Constants;
 using Rise.Common.Enums;
 using Rise.Common.Extensions;
 using Rise.Common.Interfaces;
@@ -51,6 +51,27 @@ namespace Rise.Models
 
         [Ignore]
         public bool IsLocal { get; set; } = true;
+
+        // ── iTunes migration fields ────────────────────────────────────────────
+        // These fields are populated by ITunesMigrationService and are
+        // not read from the file system during normal indexing.
+
+        /// <summary>Total number of times this song has been played.</summary>
+        [NotNull]
+        public int PlayCount { get; set; } = 0;
+
+        /// <summary>Total number of times this song has been skipped.</summary>
+        [NotNull]
+        public int SkipCount { get; set; } = 0;
+
+        /// <summary>Last time this song was played (UTC). Null if never played.</summary>
+        public DateTime? LastPlayed { get; set; } = null;
+
+        /// <summary>
+        /// Date the file was added to the Rise library (set during indexing).
+        /// Null for items indexed before this field existed.
+        /// </summary>
+        public DateTime? DateAdded { get; set; } = null;
 
         /// <summary>
         /// Returns the song title.
@@ -136,7 +157,8 @@ namespace Rise.Models
                 Location = file.Path,
                 Rating = musicProperties.Rating,
                 Bitrate = musicProperties.Bitrate,
-                IsLocal = file.IsAvailable
+                IsLocal = file.IsAvailable,
+                DateAdded = DateTime.UtcNow
             };
         }
 

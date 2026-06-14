@@ -1,4 +1,4 @@
-﻿using Rise.App.ViewModels;
+using Rise.App.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +27,23 @@ namespace Rise.App.Helpers
             { "GSongArtist", s => ((SongViewModel)s).Artist },
             { "GSongGenres", s => ((SongViewModel)s).Genres },
             { "GSongYear", s => ((SongViewModel)s).Year },
+
+            // Formatted / derived fields
+            { "SongDuration",     s => ((SongViewModel)s).Duration },
+            { "SongBitrate",      s => ((SongViewModel)s).Bitrate },
+            { "SongFileName",     s => ((SongViewModel)s).FileName },
+            { "SongAlbumArtist",  s => ((SongViewModel)s).AlbumArtist },
+
+            // iTunes migration statistics
+            { "SongPlayCount",    s => ((SongViewModel)s).PlayCount },
+            { "SongSkipCount",    s => ((SongViewModel)s).SkipCount },
+            { "SongRating",       s => ((SongViewModel)s).Rating },
+            { "SongLastPlayed",   s => ((SongViewModel)s).LastPlayed ?? DateTime.MinValue },
+            { "SongDateAdded",    s => ((SongViewModel)s).DateAdded ?? DateTime.MinValue },
+
+            // Grouping by first letter for new fields
+            { "GSongAlbumArtist", s => ((SongViewModel)s).AlbumArtist },
+            { "GSongGenres",      s => ((SongViewModel)s).Genres },
 
             { "AlbumTitle", a => ((AlbumViewModel)a).Title },
             { "AlbumArtist", a => ((AlbumViewModel)a).Artist },

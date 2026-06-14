@@ -1,7 +1,7 @@
 ﻿using Rise.Common.Extensions.Markup;
 using System;
 using System.Text;
-using Windows.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Data;
 
 namespace Rise.App.Converters
 {

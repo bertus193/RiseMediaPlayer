@@ -1,0 +1,148 @@
+<UserControl
+    x:Class="Rise.App.UserControls.SongTableRow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="using:Rise.App.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <conv:BooleanToVisibility x:Key="BoolToVis" />
+        <conv:NullToVisibility    x:Key="NullToVis" />
+    </UserControl.Resources>
+
+    <Grid ColumnSpacing="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="36"  />  <!-- #        -->
+            <ColumnDefinition Width="36"  />  <!-- Play btn -->
+            <ColumnDefinition Width="*" MinWidth="140" />  <!-- Title   -->
+            <ColumnDefinition Width="160" />  <!-- Album      -->
+            <ColumnDefinition Width="140" />  <!-- Artist     -->
+            <ColumnDefinition Width="140" />  <!-- AlbumArtist-->
+            <ColumnDefinition Width="80"  />  <!-- PlayCount  -->
+            <ColumnDefinition Width="72"  />  <!-- SkipCount  -->
+            <ColumnDefinition Width="80"  />  <!-- Rating     -->
+            <ColumnDefinition Width="60"  />  <!-- Year       -->
+            <ColumnDefinition Width="120" />  <!-- DateAdded  -->
+            <ColumnDefinition Width="120" />  <!-- LastPlayed -->
+            <ColumnDefinition Width="72"  />  <!-- Bitrate    -->
+            <ColumnDefinition Width="72"  />  <!-- Duration   -->
+        </Grid.ColumnDefinitions>
+
+        <!-- # / now-playing indicator -->
+        <TextBlock Grid.Column="0"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind TrackNumber}"
+                   Visibility="{x:Bind IsPlaying, Converter={StaticResource BoolToVis}, ConverterParameter=Inverse, Mode=OneWay}" />
+        <FontIcon Grid.Column="0"
+                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                  FontSize="14" Glyph="&#xE767;"
+                  Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                  Visibility="{x:Bind IsPlaying, Converter={StaticResource BoolToVis}, Mode=OneWay}" />
+
+        <!-- Play on hover -->
+        <Button Grid.Column="1"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="Transparent" BorderThickness="0"
+                Command="{x:Bind PlayCommand}" CommandParameter="{x:Bind Song}"
+                Style="{StaticResource TransparentButtonStyle}">
+            <FontIcon FontSize="14" Glyph="&#xE768;" />
+        </Button>
+
+        <!-- Title + optional inline artist -->
+        <StackPanel Grid.Column="2" VerticalAlignment="Center" Padding="8,0" Spacing="1">
+            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                       Text="{x:Bind Song.Title}" TextTrimming="CharacterEllipsis" />
+            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Text="{x:Bind Song.Artist}" TextTrimming="CharacterEllipsis"
+                       Visibility="{x:Bind ShowInlineArtist, Converter={StaticResource BoolToVis}}" />
+        </StackPanel>
+
+        <!-- Album -->
+        <TextBlock Grid.Column="3" VerticalAlignment="Center" Padding="8,0"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Song.Album}" TextTrimming="CharacterEllipsis"
+                   Visibility="{x:Bind ShowAlbum, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Artist -->
+        <TextBlock Grid.Column="4" VerticalAlignment="Center" Padding="8,0"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Song.Artist}" TextTrimming="CharacterEllipsis"
+                   Visibility="{x:Bind ShowArtist, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Album Artist -->
+        <TextBlock Grid.Column="5" VerticalAlignment="Center" Padding="8,0"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Song.AlbumArtist}" TextTrimming="CharacterEllipsis"
+                   Visibility="{x:Bind ShowAlbumArtist, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Play count with minibar -->
+        <Grid Grid.Column="6" VerticalAlignment="Center" Padding="8,0"
+              Visibility="{x:Bind ShowPlayCount, Converter={StaticResource BoolToVis}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="3" />
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Right"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Text="{x:Bind Song.PlayCount}" />
+            <ProgressBar Grid.Row="1" Maximum="{x:Bind MaxPlayCount}" Value="{x:Bind Song.PlayCount, Mode=OneWay}" Height="3" />
+        </Grid>
+
+        <!-- Skip count -->
+        <TextBlock Grid.Column="7" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Song.SkipCount}"
+                   Visibility="{x:Bind ShowSkipCount, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Rating -->
+        <RatingControl Grid.Column="8" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       IsReadOnly="True" MaxRating="5"
+                       Value="{x:Bind Song.Rating, Mode=OneWay}"
+                       Visibility="{x:Bind ShowRating, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Year -->
+        <TextBlock Grid.Column="9" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Song.Year}"
+                   Visibility="{x:Bind ShowYear, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Date Added -->
+        <TextBlock Grid.Column="10" VerticalAlignment="Center" Padding="8,0"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Song.DateAdded}"
+                   Visibility="{x:Bind ShowDateAdded, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Last Played -->
+        <TextBlock Grid.Column="11" VerticalAlignment="Center" Padding="8,0"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Song.LastPlayed}"
+                   Visibility="{x:Bind ShowLastPlayed, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Bitrate (kbps) -->
+        <TextBlock Grid.Column="12" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0,0,8,0"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Song.Bitrate}"
+                   Visibility="{x:Bind ShowBitrate, Converter={StaticResource BoolToVis}}" />
+
+        <!-- Duration -->
+        <TextBlock Grid.Column="13" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0,0,12,0"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Text="{x:Bind Song.Duration}"
+                   Visibility="{x:Bind ShowDuration, Converter={StaticResource BoolToVis}}" />
+    </Grid>
+</UserControl>

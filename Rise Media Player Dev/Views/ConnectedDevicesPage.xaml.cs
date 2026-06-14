@@ -1,6 +1,6 @@
 ﻿using Rise.App.ViewModels;
 using System.Collections.ObjectModel;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 

@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using Microsoft.Toolkit.Uwp.UI;
+using CommunityToolkit.WinUI.UI;
 using Rise.App.Helpers;
 using Rise.App.UserControls;
 using Rise.App.ViewModels;
@@ -14,11 +14,11 @@ using System.Threading.Tasks;
 using Windows.Media;
 using Windows.Media.Playback;
 using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace Rise.App.Views
 {
@@ -130,7 +130,7 @@ namespace Rise.App.Views
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             if (FullScreenRequested)
-                ApplicationView.GetForCurrentView().ExitFullScreenMode();
+                App.MainAppWindow.ExitFullScreen();
         }
     }
 
@@ -146,9 +146,9 @@ namespace Rise.App.Views
         [RelayCommand]
         private void ToggleFullScreen()
         {
-            var view = ApplicationView.GetForCurrentView();
+            // WinUI 3: full screen state via AppWindow
 
-            if (view.IsFullScreenMode)
+            if (App.MainAppWindow.IsFullScreen)
                 view.ExitFullScreenMode();
             else
                 _ = view.TryEnterFullScreenMode();
@@ -193,7 +193,7 @@ namespace Rise.App.Views
     {
         private async Task UpdateCurrentLyricsAsync()
         {
-            await Dispatcher;
+            await ThreadSwitcher.ResumeForegroundAsync(DispatcherQueue);
             if (MPViewModel.PlayingItemType == MediaPlaybackType.Video)
             {
                 _ = VisualStateManager.GoToState(this, "LyricsUnavailableState", true);
@@ -205,7 +205,7 @@ namespace Rise.App.Views
             await ThreadSwitcher.ResumeBackgroundAsync();
             var lyrics = await FetchLyricsForCurrentItemAsync();
 
-            await Dispatcher;
+            await ThreadSwitcher.ResumeForegroundAsync(DispatcherQueue);
             if (lyrics?.Any() ?? false)
             {
                 _lyrics = lyrics.ToList();
@@ -243,13 +243,13 @@ namespace Rise.App.Views
 
         private async void Player_SeekCompleted(MediaPlayer sender, object args)
         {
-            await Dispatcher;
+            await ThreadSwitcher.ResumeForegroundAsync(DispatcherQueue);
             UpdateCurrentLyric(sender.PlaybackSession.Position);
         }
 
         private async void PlaybackSession_PositionChanged(MediaPlaybackSession sender, object args)
         {
-            await Dispatcher;
+            await ThreadSwitcher.ResumeForegroundAsync(DispatcherQueue);
             UpdateCurrentLyric(sender.Position);
         }
 

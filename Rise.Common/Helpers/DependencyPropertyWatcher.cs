@@ -1,6 +1,6 @@
-﻿using System;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using System;
 
 namespace Rise.Common.Helpers
 {
@@ -26,8 +26,6 @@ namespace Rise.Common.Helpers
         /// Represents the method that will handle events that occur when a
         /// <see cref="DependencyPropertyWatcher{T}"/> fires a change notification.
         /// </summary>
-        /// <param name="sender">The watcher that produced the notification.</param>
-        /// <param name="newValue">The new value for the property being watched.</param>
         public delegate void PropertyWatcherFiredEventHandler(DependencyPropertyWatcher<T> sender, T newValue);
 
         /// <summary>
@@ -49,11 +47,19 @@ namespace Rise.Common.Helpers
 
         private void PropertyChangedCallback(DependencyObject sender, DependencyProperty dp)
         {
-            _ = sender.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            if (sender is FrameworkElement fe && fe.DispatcherQueue is DispatcherQueue dq)
+            {
+                dq.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    object val = sender.GetValue(dp);
+                    PropertyChanged?.Invoke(this, (T)val);
+                });
+            }
+            else
             {
                 object val = sender.GetValue(dp);
                 PropertyChanged?.Invoke(this, (T)val);
-            });
+            }
         }
 
         /// <summary>

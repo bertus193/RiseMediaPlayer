@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using Windows.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Data;
 
 namespace Rise.Data.Collections;
 

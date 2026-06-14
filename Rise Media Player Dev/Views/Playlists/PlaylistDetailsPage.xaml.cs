@@ -12,11 +12,11 @@ using System;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using Windows.UI.Composition;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 
 namespace Rise.App.Views
 {
@@ -156,7 +156,7 @@ namespace Rise.App.Views
             if (e.ClickedItem is VideoViewModel video && !KeyboardHelpers.IsCtrlPressed())
             {
                 await MPViewModel.PlaySingleItemAsync(video);
-                if (Window.Current.Content is Frame rootFrame)
+                if (XamlRoot?.Content is Frame rootFrame)
                     rootFrame.Navigate(typeof(NowPlayingPage));
             }
         }
@@ -164,7 +164,7 @@ namespace Rise.App.Views
         private async void PlayVideo_Click(object sender, RoutedEventArgs e)
         {
             await MPViewModel.PlaySingleItemAsync(SelectedVideo);
-            if (Window.Current.Content is Frame rootFrame)
+            if (XamlRoot?.Content is Frame rootFrame)
                 _ = rootFrame.Navigate(typeof(NowPlayingPage));
         }
 

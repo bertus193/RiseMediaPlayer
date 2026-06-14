@@ -5,9 +5,9 @@ using Rise.Common.Extensions.Markup;
 using Rise.Common.Helpers;
 using Rise.Data.Collections;
 using System;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 
 namespace Rise.App.Views
 {

@@ -1,10 +1,9 @@
-﻿using Rise.Common.Helpers;
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Rise.Common.Helpers;
 using System;
-using Windows.Foundation;
 using Windows.Media.Playback;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 
 namespace Rise.App.UserControls
 {
@@ -13,9 +12,6 @@ namespace Rise.App.UserControls
     /// </summary>
     public sealed partial class RiseMediaPlayerElement : MediaPlayerElement
     {
-        /// <summary>
-        /// Gets or sets the player's visibility.
-        /// </summary>
         public Visibility MediaPlayerVisibility
         {
             get => (Visibility)GetValue(MediaPlayerVisibilityProperty);
@@ -26,7 +22,7 @@ namespace Rise.App.UserControls
     // Dependency Properties
     public sealed partial class RiseMediaPlayerElement : MediaPlayerElement
     {
-        public readonly static DependencyProperty MediaPlayerVisibilityProperty =
+        public static readonly DependencyProperty MediaPlayerVisibilityProperty =
             DependencyProperty.Register(nameof(MediaPlayerVisibility), typeof(Visibility),
                 typeof(RiseMediaPlayerElement), new PropertyMetadata(Visibility.Visible));
     }
@@ -34,21 +30,25 @@ namespace Rise.App.UserControls
     // Event handlers
     public sealed partial class RiseMediaPlayerElement : MediaPlayerElement
     {
-        private async void OnVolumeChanged(MediaPlayer sender, object args)
+        private void OnVolumeChanged(MediaPlayer sender, object args)
         {
             if (!sender.IsMuted)
-                await HandleVolumeChangedAsync(sender.Volume);
+                HandleVolumeChanged(sender.Volume);
         }
 
-        private async void OnIsMutedChanged(MediaPlayer sender, object args)
+        private void OnIsMutedChanged(MediaPlayer sender, object args)
         {
             if (!sender.IsMuted)
-                await HandleVolumeChangedAsync(sender.Volume);
+                HandleVolumeChanged(sender.Volume);
             else
-                await HandleMutedAsync();
+                HandleMuted();
         }
 
-        private IAsyncAction HandleVolumeChangedAsync(double newVolume)
+        /// <summary>
+        /// Dispatches a VisualState change for the volume icon onto the UI thread.
+        /// Replaces IAsyncAction Dispatcher.RunAsync(CoreDispatcherPriority.Normal, …).
+        /// </summary>
+        private void HandleVolumeChanged(double newVolume)
         {
             var state = newVolume switch
             {
@@ -58,26 +58,22 @@ namespace Rise.App.UserControls
                 _ => "HighVolumeState",
             };
 
-            return Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                _ = VisualStateManager.GoToState(TransportControls, state, true);
-            });
+            // DispatcherQueue replaces CoreDispatcher.RunAsync
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                _ = VisualStateManager.GoToState(TransportControls, state, true));
         }
 
-        private IAsyncAction HandleMutedAsync()
+        private void HandleMuted()
         {
-            return Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                _ = VisualStateManager.GoToState(TransportControls, "NoVolumeState", true);
-            });
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                _ = VisualStateManager.GoToState(TransportControls, "NoVolumeState", true));
         }
 
-        private IAsyncAction RegisterVolumeChangedAsync()
+        private void RegisterVolumeChanged()
         {
             MediaPlayer.VolumeChanged += OnVolumeChanged;
             MediaPlayer.IsMutedChanged += OnIsMutedChanged;
-
-            return HandleVolumeChangedAsync(MediaPlayer.Volume);
+            HandleVolumeChanged(MediaPlayer.Volume);
         }
     }
 
@@ -96,9 +92,9 @@ namespace Rise.App.UserControls
             Unloaded += OnUnloaded;
         }
 
-        private async void OnMediaPlayerChanged(DependencyPropertyWatcher<MediaPlayer> sender, MediaPlayer newValue)
+        private void OnMediaPlayerChanged(DependencyPropertyWatcher<MediaPlayer> sender, MediaPlayer newValue)
         {
-            await RegisterVolumeChangedAsync();
+            RegisterVolumeChanged();
             _playerWatcher.Dispose();
         }
 

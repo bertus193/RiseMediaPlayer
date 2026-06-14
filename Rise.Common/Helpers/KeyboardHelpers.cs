@@ -1,4 +1,5 @@
-﻿using Windows.UI.Core;
+using Microsoft.UI.Input;
+using Windows.System;
 
 namespace Rise.Common.Helpers
 {
@@ -6,8 +7,8 @@ namespace Rise.Common.Helpers
     {
         public static bool IsCtrlPressed()
         {
-            CoreVirtualKeyStates state = CoreWindow.GetForCurrentThread().GetKeyState(Windows.System.VirtualKey.Control);
-            return (state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
+            var state = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
+            return state.HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
         }
     }
 }

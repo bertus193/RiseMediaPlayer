@@ -1,5 +1,5 @@
-﻿using Windows.ApplicationModel.Resources;
-using Windows.UI.Xaml.Markup;
+using Microsoft.UI.Xaml.Markup;
+using Windows.ApplicationModel.Resources;
 
 namespace Rise.Common.Extensions.Markup
 {
@@ -24,8 +24,7 @@ namespace Rise.Common.Extensions.Markup
         }
 
         /// <summary>
-        /// Gets the string from the resource with the provided
-        /// identifier.
+        /// Gets the string from the resource with the provided identifier.
         /// </summary>
         public static string GetString(string resource)
         {
@@ -33,10 +32,7 @@ namespace Rise.Common.Extensions.Markup
         }
 
         /// <summary>
-        /// Gets the provided count as a localized string, using the format
-        /// from the provided resource. The format for this kind of resource
-        /// is "One{resource}" when count equals 1, and "N{resource}s" for
-        /// everything else.
+        /// Gets the provided count as a localized string.
         /// </summary>
         public static string GetLocalizedCount(string formatResource, int count)
         {

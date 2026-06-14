@@ -6,9 +6,9 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace Rise.App.Views.Albums.Properties
 {
@@ -33,7 +33,7 @@ namespace Rise.App.Views.Albums.Properties
         private async void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             await Album.CancelEditsAsync();
-            _ = await ApplicationView.GetForCurrentView().TryConsolidateAsync();
+            App.MainAppWindow.Close();
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -53,7 +53,7 @@ namespace Rise.App.Views.Albums.Properties
 
             await Repository.UpsertQueuedAsync();
 
-            _ = await ApplicationView.GetForCurrentView().TryConsolidateAsync();
+            App.MainAppWindow.Close();
         }
 
         private void NavigationView_SelectionChanged(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewSelectionChangedEventArgs args)

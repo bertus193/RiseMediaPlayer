@@ -2,9 +2,9 @@
 using Rise.Common.Constants;
 using Rise.Common.Extensions;
 using Rise.Common.Helpers;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace Rise.App.Views
 {
@@ -39,7 +39,7 @@ namespace Rise.App.Views
             => _navigationHelper.OnNavigatedFrom(e);
         #endregion
 
-        private void Discy_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        private void Discy_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             DiscyAboutTip.IsOpen = true;
         }
@@ -47,9 +47,9 @@ namespace Rise.App.Views
         private async void LearnMoreButton_Click(object sender, RoutedEventArgs e)
             => _ = await URLs.Readme.LaunchAsync();
 
-        private void AppSettingsHyperlink_Click(Windows.UI.Xaml.Documents.Hyperlink sender, Windows.UI.Xaml.Documents.HyperlinkClickEventArgs args)
+        private void AppSettingsHyperlink_Click(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
-            if (Window.Current.Content is Frame rootFrame)
+            if (XamlRoot?.Content is Frame rootFrame)
             {
                 _ = rootFrame.Navigate(typeof(AllSettingsPage));
             }
