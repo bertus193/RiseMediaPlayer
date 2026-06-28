@@ -19,6 +19,7 @@ namespace Rise.App.Views
         {
             var dialog = new ContentDialog
             {
+                XamlRoot = this.XamlRoot,
                 Content = new SetupDialogContent(),
                 FullSizeDesired = true,
             };

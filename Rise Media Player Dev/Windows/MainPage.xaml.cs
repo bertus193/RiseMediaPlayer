@@ -123,7 +123,14 @@ namespace Rise.App.Views
                 if (ContentFrame.Content == null)
                     ContentFrame.Navigate(Destinations[SViewModel.Open]);
 
-                await App.InitializeChangeTrackingAsync();
+                try
+                {
+                    await App.InitializeChangeTrackingAsync();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"InitializeChangeTrackingAsync failed: {ex}");
+                }
 
                 if (SViewModel.IndexingAtStartupEnabled || SViewModel.IsFirstLaunch)
                 {

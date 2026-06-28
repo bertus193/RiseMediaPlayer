@@ -63,8 +63,19 @@ namespace Rise.App.ViewModels
 
         public void UpdateStartupTaskInfo()
         {
-            var task = Rise.Common.Extensions.AsyncExtensions.Get(StartupTask.GetAsync(StartupTaskId));
-            SetOpenAtStartupInfo(task.State);
+            try
+            {
+                var task = Rise.Common.Extensions.AsyncExtensions.Get(StartupTask.GetAsync(StartupTaskId));
+                SetOpenAtStartupInfo(task.State);
+            }
+            catch (Exception)
+            {
+                // Si la app está unpackaged o StartupTask no está disponible,
+                // simplemente deshabilitamos la opción de inicio automático
+                OpenInLogin = false;
+                CanOpenInLogin = false;
+                FLGStartupTask = 0;
+            }
         }
 
         private void SetOpenAtStartupInfo(StartupTaskState state)

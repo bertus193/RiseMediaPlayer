@@ -133,6 +133,7 @@ namespace Rise.App.Views
         {
             ContentDialog dialog = new()
             {
+                XamlRoot = this.XamlRoot,
                 Title = ResourceHelper.GetString("/Settings/MediaLibraryManageFoldersTitle"),
                 CloseButtonText = ResourceHelper.GetString("Close"),
                 Content = new Settings.MediaSourcesPage()

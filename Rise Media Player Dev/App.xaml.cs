@@ -143,9 +143,17 @@ namespace Rise.App
 
         private static StorageLibrary OnStorageLibraryRequested(KnownLibraryId id)
         {
-            var library = Rise.Common.Extensions.AsyncExtensions.Get(StorageLibrary.GetLibraryAsync(id));
-            library.ChangeTracker.Enable();
-            return library;
+            try
+            {
+                var library = Rise.Common.Extensions.AsyncExtensions.Get(StorageLibrary.GetLibraryAsync(id));
+                library?.ChangeTracker?.Enable();
+                return library;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"StorageLibrary.GetLibraryAsync failed: {ex}");
+                return null;
+            }
         }
     }
 
@@ -156,15 +164,29 @@ namespace Rise.App
         {
             if (SViewModel.IndexingFileTrackingEnabled)
             {
-                _ = await MusicLibrary.TrackBackgroundAsync($"{nameof(MusicLibrary)} background tracker");
-                var result = await VideoLibrary.TrackBackgroundAsync($"{nameof(VideoLibrary)} background tracker");
-
-                if (result == BackgroundTaskRegistrationStatus.Successful ||
-                    result == BackgroundTaskRegistrationStatus.AlreadyExists)
+                // Verificar que tenemos acceso a las bibliotecas (packaged)
+                if (MusicLibrary == null || VideoLibrary == null)
                 {
-                    MusicLibrary.DefinitionChanged += OnLibraryDefinitionChanged;
-                    VideoLibrary.DefinitionChanged += OnLibraryDefinitionChanged;
+                    RestartIndexingTimer();
                     return;
+                }
+
+                try
+                {
+                    _ = await MusicLibrary.TrackBackgroundAsync($"{nameof(MusicLibrary)} background tracker");
+                    var result = await VideoLibrary.TrackBackgroundAsync($"{nameof(VideoLibrary)} background tracker");
+
+                    if (result == BackgroundTaskRegistrationStatus.Successful ||
+                        result == BackgroundTaskRegistrationStatus.AlreadyExists)
+                    {
+                        MusicLibrary.DefinitionChanged += OnLibraryDefinitionChanged;
+                        VideoLibrary.DefinitionChanged += OnLibraryDefinitionChanged;
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"TrackBackgroundAsync failed: {ex}");
                 }
             }
 

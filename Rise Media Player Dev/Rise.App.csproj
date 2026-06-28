@@ -16,6 +16,7 @@
     <!-- Unpackaged desktop app - no AppContainer sandbox -->
     <WindowsPackageType>None</WindowsPackageType>
     <Platforms>x86;x64;ARM64</Platforms>
+	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
 
   <ItemGroup>

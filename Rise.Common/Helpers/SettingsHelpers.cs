@@ -1,62 +1,118 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using Windows.ApplicationModel;
 using Windows.Storage;
 
 namespace Rise.Common.Helpers
 {
-    /// <summary>
-    /// Contains helper methods to get and set app settings.
-    /// </summary>
     public static class SettingsHelpers
     {
-        private static readonly ApplicationDataContainer LocalSettings
-            = ApplicationData.Current.LocalSettings;
+        private static readonly ISettingsStore _store;
 
-        /// <summary>
-        /// Gets the value of an app setting stored locally.
-        /// </summary>
-        /// <param name="defaultValue">Default value for the setting - see remarks.</param>
-        /// <param name="container">The name of the settings container to get the setting from.</param>
-        /// <param name="setting">The name of the setting.</param>
-        /// <returns>The setting value if it already exists, the default value otherwise.</returns>
-        /// <remarks>If the setting doesn't exist yet, the default value is saved before
-        /// returning.</remarks>
-        /// <exception cref="InvalidCastException">Thrown if the setting cannot be casted to
-        /// <typeparamref name="T"/>.</exception>
-        public static T GetLocal<T>(T defaultValue, string container, string setting)
+        static SettingsHelpers()
         {
-            // Get the container values, always create it if it doesn't exist
-            var values = LocalSettings.CreateContainer(container, ApplicationDataCreateDisposition.Always).Values;
-
-            values[setting] ??= defaultValue;
-            var value = (T)values[setting];
-
-            return value;
+            try
+            {
+                // Intentar usar ApplicationData (packaged)
+                var _ = ApplicationData.Current.LocalSettings;
+                _store = new PackagedSettingsStore();
+            }
+            catch (InvalidOperationException)
+            {
+                // Fallback para unpackaged: usar JSON en %LOCALAPPDATA%
+                _store = new UnpackagedSettingsStore();
+            }
         }
 
-        /// <summary>
-        /// Sets the value of an app setting stored locally.
-        /// </summary>
-        /// <param name="newValue">New value for the setting.</param>
-        /// <param name="container">The name of the settings container this setting will
-        /// be stored in.</param>
-        /// <param name="setting">The name of the setting.</param>
-        /// <exception cref="ArgumentException">Thrown if the currently stored setting
-        /// is not an instance of <typeparamref name="T"/>.</exception>
+        public static T GetLocal<T>(T defaultValue, string container, string setting)
+        {
+            return _store.Get<T>(defaultValue, container, setting);
+        }
+
         public static void SetLocal<T>(T newValue, string container, string setting)
         {
-            // Get the container, always create it if it doesn't exist
-            var values = LocalSettings.CreateContainer(container, ApplicationDataCreateDisposition.Always).Values;
+            _store.Set<T>(newValue, container, setting);
+        }
+    }
 
-            // Check whether type matches
-            object value = values[setting];
-            if (value is not T && value != null)
+    // Interfaz común
+    public interface ISettingsStore
+    {
+        T Get<T>(T defaultValue, string container, string setting);
+        void Set<T>(T newValue, string container, string setting);
+    }
+
+    // Implementación para apps empaquetadas (MSIX)
+    public class PackagedSettingsStore : ISettingsStore
+    {
+        private readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
+
+        public T Get<T>(T defaultValue, string container, string setting)
+        {
+            var values = _localSettings.CreateContainer(container, ApplicationDataCreateDisposition.Always).Values;
+            values[setting] ??= defaultValue;
+            return (T)values[setting];
+        }
+
+        public void Set<T>(T newValue, string container, string setting)
+        {
+            var values = _localSettings.CreateContainer(container, ApplicationDataCreateDisposition.Always).Values;
+            values[setting] = newValue;
+        }
+    }
+
+    // Implementación para apps unpackaged (JSON en %LOCALAPPDATA%\Rise Media Player\Settings)
+    public class UnpackagedSettingsStore : ISettingsStore
+    {
+        private readonly string _settingsPath;
+
+        public UnpackagedSettingsStore()
+        {
+            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            _settingsPath = Path.Combine(localAppData, "Rise Media Player", "Settings");
+            Directory.CreateDirectory(_settingsPath);
+        }
+
+        private string GetFilePath(string container) => Path.Combine(_settingsPath, $"{container}.json");
+
+        public T Get<T>(T defaultValue, string container, string setting)
+        {
+            var path = GetFilePath(container);
+            if (!File.Exists(path)) return defaultValue;
+
+            try
             {
-                string message = $"Type mismatch for \"{setting}\" in \"{container}\" container. Current type is {value.GetType()}";
-                throw new ArgumentException(message, nameof(setting));
+                var json = File.ReadAllText(path);
+                var dict = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json);
+                if (dict != null && dict.TryGetValue(setting, out var element))
+                {
+                    return JsonSerializer.Deserialize<T>(element.GetRawText()) ?? defaultValue;
+                }
+            }
+            catch { }
+            return defaultValue;
+        }
+
+        public void Set<T>(T newValue, string container, string setting)
+        {
+            var path = GetFilePath(container);
+            Dictionary<string, object> dict = new();
+
+            if (File.Exists(path))
+            {
+                try
+                {
+                    var json = File.ReadAllText(path);
+                    dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json) ?? new();
+                }
+                catch { }
             }
 
-            // Set the setting to the desired value
-            values[setting] = newValue;
+            dict[setting] = newValue;
+            var output = JsonSerializer.Serialize(dict, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(path, output);
         }
     }
 }

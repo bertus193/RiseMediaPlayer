@@ -83,6 +83,7 @@ namespace Rise.App.Views
         {
             ContentDialog dialog = new()
             {
+                XamlRoot = this.XamlRoot,
                 Title = ResourceHelper.GetString("/Settings/MediaLibraryManageFoldersTitle"),
                 CloseButtonText = ResourceHelper.GetString("Close"),
                 Content = new Settings.MediaSourcesPage()
@@ -95,6 +96,7 @@ namespace Rise.App.Views
             var svm = SelectedItem;
             ContentDialog dialog = new()
             {
+                XamlRoot = this.XamlRoot,
                 Title = ResourceHelper.GetString("DeleteSong"),
                 Content = string.Format(ResourceHelper.GetString("ConfirmRemovalSong"), svm.Title),
                 PrimaryButtonStyle = Resources["AccentButtonStyle"] as Style,

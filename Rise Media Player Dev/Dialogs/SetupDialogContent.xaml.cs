@@ -117,13 +117,27 @@ namespace Rise.App.Dialogs
             {
                 HideDialog();
 
-                var rootFrame = XamlRoot?.Content as Frame;
-                _ = rootFrame.Navigate(typeof(MainPage));
+                // LOGGING TEMPORAL
+                System.Diagnostics.Debug.WriteLine($"MainAppWindow is null: {App.MainAppWindow == null}");
+                System.Diagnostics.Debug.WriteLine($"RootFrame is null: {App.MainAppWindow?.RootFrame == null}");
+
+                var rootFrame = App.MainAppWindow?.RootFrame;
+                if (rootFrame != null)
+                {
+                    _ = rootFrame.Navigate(typeof(MainPage));
+                }
+                else
+                {
+                    // Si RootFrame es null, algo está muy mal
+                    throw new InvalidOperationException("RootFrame is null. Cannot navigate to MainPage.");
+                }
             }
         }
 
         private void HideDialog()
         {
+            if (XamlRoot == null) return;
+
             var popups = VisualTreeHelper.GetOpenPopupsForXamlRoot(XamlRoot);
             foreach (var popup in popups)
             {
