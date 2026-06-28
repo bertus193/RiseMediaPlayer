@@ -63,7 +63,7 @@ namespace Rise.App.ViewModels
 
         public void UpdateStartupTaskInfo()
         {
-            var task = StartupTask.GetAsync(StartupTaskId).Get();
+            var task = Rise.Common.Extensions.AsyncExtensions.Get(StartupTask.GetAsync(StartupTaskId));
             SetOpenAtStartupInfo(task.State);
         }
 

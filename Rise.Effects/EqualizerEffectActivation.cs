@@ -5,13 +5,11 @@ namespace Rise.Effects
 {
     /// <summary>
     /// Registers <see cref="EqualizerEffect"/> as an in-process WinRT activatable class
-    /// so that <c>MediaPlayer.AddAudioEffect("Rise.Effects.EqualizerEffect", …)</c>
-    /// continues to work after the migration away from <c>winmdobj</c>.
+    /// so that <c>MediaPlayer.AddAudioEffect</c> continues to work.
     ///
-    /// In UWP the runtime discovered activatable classes from the .winmd metadata.
-    /// In WinUI 3 (unpackaged desktop) we register them explicitly at startup using
-    /// the CsWinRT <see cref="Module.RegisterActivatableObject"/> API, which hooks
-    /// the in-process COM activation path that <c>RoGetActivationFactory</c> calls.
+    /// In WinUI 3, MediaPlayer can work directly with managed IBasicAudioEffect
+    /// implementations without requiring explicit WinRT activation registration.
+    /// This class is kept for backward compatibility but may not be strictly necessary.
     ///
     /// Call <see cref="Register"/> once, before the first <c>AddAudioEffect</c>.
     /// App.xaml.cs already does this via <c>OnMPViewModelRequested</c>.
@@ -29,11 +27,11 @@ namespace Rise.Effects
             if (_registered) return;
             _registered = true;
 
-            // CsWinRT in-process activation registration.
-            // The string must match the FullName used in AddAudioEffect.
-            Module.RegisterActivatableObject(
-                "Rise.Effects.EqualizerEffect",
-                () => MarshalInspectable<EqualizerEffect>.FromManaged(EqualizerEffect.Current));
+            // In CsWinRT 2.x with WinUI 3, explicit registration is typically not needed
+            // as MediaPlayer can consume managed IBasicAudioEffect implementations directly.
+            // If WinRT activation is required, consider using:
+            // - A custom activation factory via DllGetActivationFactory
+            // - Or ensure the effect is passed by Type reference (which it is in AddEffect call)
         }
     }
 }

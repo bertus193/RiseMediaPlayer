@@ -8,7 +8,7 @@
     xmlns:markup="using:Rise.Common.Extensions.Markup"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:tkitctrls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI.Triggers"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     d:DesignHeight="64"
     d:DesignWidth="600"
     PointerEntered="OnPointerEntered"

@@ -9,7 +9,6 @@
 
     <UserControl.Resources>
         <conv:BooleanToVisibility x:Key="BoolToVis" />
-        <conv:NullToVisibility    x:Key="NullToVis" />
     </UserControl.Resources>
 
     <Grid ColumnSpacing="0">

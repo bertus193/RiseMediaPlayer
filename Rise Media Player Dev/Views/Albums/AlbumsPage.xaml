@@ -10,7 +10,7 @@
     xmlns:markup="using:Rise.Common.Extensions.Markup"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    xmlns:tkitanim="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:tkitanim="using:CommunityToolkit.WinUI.Animations"
     xmlns:uc="using:Rise.App.UserControls"
     xmlns:viewmodels="using:Rise.App.ViewModels"
     x:Name="PageRoot"

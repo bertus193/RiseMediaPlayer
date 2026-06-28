@@ -66,7 +66,7 @@ namespace Rise.App.Views
                 _currentSortKey = delegateKey;
                 _sortAscending  = true;
                 bool alphabetical = delegateKey.StartsWith("G");
-                MediaViewModel.CreateViewModel(delegateKey, SortDirection.Ascending, alphabetical,
+                CreateViewModel(delegateKey, SortDirection.Ascending, alphabetical,
                     App.MViewModel.Songs);
             }
 

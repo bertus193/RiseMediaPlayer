@@ -70,7 +70,7 @@ namespace Rise.Data.Navigation
                 Label = "LocalVideos",
                 AccessKey = "L",
                 FlyoutId = "RemoveItemFlyout"
-            }
+            },
 
 
             new NavigationItemHeader()

@@ -1,4 +1,4 @@
-﻿using Rise.App.Views;
+using Rise.App.Views;
 using Rise.Common.Constants;
 using Rise.Common.Extensions;
 using Rise.Common.Extensions.Markup;
@@ -25,8 +25,6 @@ namespace Rise.App.Settings
             InitializeComponent();
             _navigationHelper = new NavigationHelper(this);
             Current = this;
-
-            TitleBar.SetTitleBarForCurrentView();
 
             _ = SettingsMainFrame.Navigate(typeof(AppearanceBasePage));
             FinishNavigation();

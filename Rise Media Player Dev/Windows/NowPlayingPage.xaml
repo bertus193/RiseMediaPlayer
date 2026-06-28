@@ -7,13 +7,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:markup="using:Rise.Common.Extensions.Markup"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:media="using:CommunityToolkit.WinUI.UI.Media"
+    xmlns:media="using:CommunityToolkit.WinUI.Media"
     xmlns:models="using:Rise.Models"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    xmlns:skuc="using:SimpleKit.WindowsRuntime.UI.Controls"
-    xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
+    xmlns:ext="using:CommunityToolkit.WinUI"
+    xmlns:triggers="using:CommunityToolkit.WinUI"
     xmlns:uc="using:Rise.App.UserControls"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:ui="using:CommunityToolkit.WinUI.Media"
     xmlns:visualizers="using:Rise.App.Visualizers"
     d:Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     d:DesignHeight="300"
@@ -86,15 +86,12 @@
                 <TranslateTransform x:Name="TitleAreaTranslate" />
             </Grid.RenderTransform>
 
-            <skuc:TitleBar
+            <Grid
                 x:Name="TitleBar"
-                Title="{markup:ResourceHelper Name=NowPlaying}"
                 Grid.ColumnSpan="2"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
-                Canvas.ZIndex="0"
-                Icon="{ui:FontIcon FontFamily={StaticResource PlayerIconsFontFamily},
-                                   Glyph=&#xE93D;}" />
+                Canvas.ZIndex="0" />
 
             <Button
                 Height="32"
@@ -133,11 +130,8 @@
                     Height="102"
                     Margin="12,0,12,12"
                     HorizontalControlsAlignment="Left"
-                    IsCompactOverlayButtonVisible="True"
-                    IsCompactOverlayEnabled="True"
                     IsEqualizerButtonEnabled="True"
                     IsEqualizerButtonVisible="True"
-                    IsFullWindowButtonVisible="True"
                     IsLyricsButtonVisible="True"
                     IsLyricsEnabled="True"
                     IsNextTrackButtonVisible="True"
@@ -191,13 +185,13 @@
                 BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                 BorderThickness="1"
                 CornerRadius="8">
-                <ui:Effects.Shadow>
+                <ext:Effects.Shadow>
                     <media:AttachedCardShadow
                         BlurRadius="8"
                         CornerRadius="8"
                         Opacity="0.2"
                         Offset="0,4,0" />
-                </ui:Effects.Shadow>
+                </ext:Effects.Shadow>
             </Border>
 
             <Grid
@@ -247,14 +241,14 @@
                 </TransitionCollection>
             </Border.Transitions>
 
-            <ui:Effects.Shadow>
+            <ext:Effects.Shadow>
                 <media:AttachedCardShadow
                     x:Name="SidebarShadow"
                     BlurRadius="64"
                     CornerRadius="8"
                     Opacity=".25"
                     Offset="0,16,0" />
-            </ui:Effects.Shadow>
+            </ext:Effects.Shadow>
 
             <!--  Sidebar content  -->
             <Grid
@@ -357,9 +351,6 @@
 
                     <VisualState.Setters>
                         <Setter Target="InfoGrid.Visibility" Value="Collapsed" />
-
-                        <Setter Target="TitleBar.Icon" Value="{ui:FontIcon FontFamily={StaticResource PlayerIconsFontFamily}, Glyph=&#xE8B2;}" />
-                        <Setter Target="TitleBar.Title" Value="{x:Bind MPViewModel.PlayingItemProperties.Title, Mode=OneWay}" />
 
                         <Setter Target="SidebarShadow.Opacity" Value=".75" />
 

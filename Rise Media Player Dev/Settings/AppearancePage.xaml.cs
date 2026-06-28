@@ -4,9 +4,9 @@ using Rise.Common.Extensions.Markup;
 using Rise.Models;
 using System;
 using System.Collections.Generic;
-using Windows.ApplicationModel.Core;
 using Windows.UI;
 using Windows.UI.ViewManagement;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -107,7 +107,7 @@ namespace Rise.App.Settings
             static void AddColor(byte r, byte g, byte b)
             {
                 var color = Color.FromArgb(255, r, g, b);
-                string name = ColorHelper.ToDisplayName(color);
+                string name = $"#{r:X2}{g:X2}{b:X2}";
 
                 _glazeColors.Add(new(name, color));
             }
@@ -132,7 +132,7 @@ namespace Rise.App.Settings
             switch (glaze)
             {
                 case GlazeTypes.None:
-                    ViewModel.GlazeColors = Colors.Transparent;
+                    ViewModel.GlazeColors = Microsoft.UI.Colors.Transparent;
                     break;
 
                 case GlazeTypes.AccentColor:
@@ -160,7 +160,7 @@ namespace Rise.App.Settings
             ViewModel.GlazeColors = Color.FromArgb(25, col.R, col.G, col.B);
         }
 
-        private async void ChangeThemeTip_ActionButtonClick(Microsoft.UI.Xaml.Controls.TeachingTip sender, object args)
-            => _ = await Microsoft.Windows.AppLifecycle.AppInstance.Restart("ThemeChanged");
+        private void ChangeThemeTip_ActionButtonClick(Microsoft.UI.Xaml.Controls.TeachingTip sender, object args)
+            => _ = Microsoft.Windows.AppLifecycle.AppInstance.Restart("ThemeChanged");
     }
 }

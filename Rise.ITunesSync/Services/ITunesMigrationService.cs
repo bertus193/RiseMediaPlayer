@@ -1,3 +1,4 @@
+using Rise.Common.Extensions;
 using Rise.ITunesSync.Models;
 using Rise.Models;
 using Rise.NewRepository;

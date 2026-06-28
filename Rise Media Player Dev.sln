@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31825.309
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11723.231 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rise.App", "Rise Media Player Dev\Rise.App.csproj", "{5DF9776E-7514-4365-A6FB-7718BA80945D}"
 EndProject
@@ -14,6 +13,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rise.Repository", "Rise.NewRepository\Rise.Repository.csproj", "{1319CE6D-828F-4024-93C9-4052F3F053BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rise.Effects", "Rise.Effects\Rise.Effects.csproj", "{5DE7E2F1-4095-45A1-914D-98047CD29736}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rise.ITunesSync", "Rise.ITunesSync\Rise.ITunesSync.csproj", "{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,6 +132,22 @@ Global
 		{5DE7E2F1-4095-45A1-914D-98047CD29736}.Release|x64.Build.0 = Release|x64
 		{5DE7E2F1-4095-45A1-914D-98047CD29736}.Release|x86.ActiveCfg = Release|x86
 		{5DE7E2F1-4095-45A1-914D-98047CD29736}.Release|x86.Build.0 = Release|x86
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Debug|x64.Build.0 = Debug|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Debug|x86.Build.0 = Debug|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Release|ARM64.Build.0 = Release|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Release|x64.ActiveCfg = Release|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Release|x64.Build.0 = Release|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Release|x86.ActiveCfg = Release|Any CPU
+		{5C8018B7-75C2-2B11-E0FE-F6B377CDAD06}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

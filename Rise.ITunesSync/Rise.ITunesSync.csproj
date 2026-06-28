@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Rise.Models\Rise.Models.csproj" />
+    <ProjectReference Include="..\Rise.NewRepository\Rise.Repository.csproj" />
   </ItemGroup>
 
 </Project>

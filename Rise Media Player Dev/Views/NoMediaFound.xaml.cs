@@ -19,5 +19,7 @@ namespace Rise.App.Views
             // Button colours and drag region are already set by MainWindow.ConfigureTitleBar()
             App.MainAppWindow.SetTitleBarElement(AppTitleBar);
         }
+            private void AddMedia_Click(object sender, RoutedEventArgs e)
+                => Frame.Navigate(typeof(Rise.App.Settings.AllSettingsPage));
+        }
     }
-}

@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.WinUI.Helpers;
+﻿using CommunityToolkit.WinUI;
+using CommunityToolkit.WinUI.Helpers;
 using Rise.App.ViewModels;
 using System;
 using Windows.System;

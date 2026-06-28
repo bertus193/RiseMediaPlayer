@@ -1,4 +1,4 @@
-﻿using Rise.Common.Constants;
+using Rise.Common.Constants;
 using Rise.Common.Extensions;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
@@ -18,7 +18,6 @@ namespace Rise.App.Views
         public CrashDetailsPage()
         {
             InitializeComponent();
-            TitleBar.SetTitleBarForCurrentView();
         }
 
         public static Task<bool> TryShowAsync(string crashDetails)

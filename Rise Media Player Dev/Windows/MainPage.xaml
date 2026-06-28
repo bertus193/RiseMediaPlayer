@@ -2,7 +2,7 @@
     x:Class="Rise.App.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:conv="using:Rise.App.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:Rise.Common.Helpers"
@@ -13,9 +13,9 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:nav="using:Rise.Data.Navigation"
     xmlns:selectors="using:Rise.App.TemplateSelectors"
-    xmlns:skuc="using:SimpleKit.WindowsRuntime.UI.Controls"
     xmlns:uc="using:Rise.App.UserControls"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:ext="using:CommunityToolkit.WinUI"
+    xmlns:ui="using:CommunityToolkit.WinUI.Media"
     xmlns:viewmodels="using:Rise.App.ViewModels"
     Loaded="OnPageLoaded"
     Unloaded="OnPageUnloaded"
@@ -27,7 +27,6 @@
                 <ResourceDictionary x:Key="Default">
                     <media:AcrylicBrush
                         x:Key="MediaTransportControlsPanelBackground"
-                        BackgroundSource="Backdrop"
                         FallbackColor="#2C2C2C"
                         TintColor="{x:Bind SViewModel.GlazeColors, Mode=OneWay}"
                         TintLuminosityOpacity="0"
@@ -37,7 +36,6 @@
                 <ResourceDictionary x:Key="Light">
                     <media:AcrylicBrush
                         x:Key="MediaTransportControlsPanelBackground"
-                        BackgroundSource="Backdrop"
                         FallbackColor="#F9F9F9"
                         TintColor="{x:Bind SViewModel.GlazeColors, Mode=OneWay}"
                         TintLuminosityOpacity="0"
@@ -350,20 +348,22 @@
             Height="48"
             VerticalAlignment="Top"
             Canvas.ZIndex="1">
-            <skuc:TitleBar
+            <StackPanel
                 x:Name="AppTitleBar"
                 VerticalAlignment="Stretch"
-                Canvas.ZIndex="1">
-                <skuc:TitleBar.Icon>
-                    <IconSourceElement
-                        Width="16"
-                        Height="16"
-                        IconSource="{StaticResource TitleBarAppIconSource}" />
-                </skuc:TitleBar.Icon>
+                Canvas.ZIndex="1"
+                Orientation="Horizontal"
+                Spacing="8">
+                <IconSourceElement
+                    Width="16"
+                    Height="16"
+                    VerticalAlignment="Center"
+                    IconSource="{StaticResource TitleBarAppIconSource}" />
 
                 <RichTextBlock
                     x:Name="AppTitle"
                     FontSize="12"
+                    VerticalAlignment="Center"
                     IsTextSelectionEnabled="False"
                     Visibility="Collapsed">
                     <Paragraph x:Name="DefaultTitleParagraph">
@@ -371,7 +371,7 @@
                         <Span>Media Player</Span>
                     </Paragraph>
                 </RichTextBlock>
-            </skuc:TitleBar>
+            </StackPanel>
 
             <Grid
                 x:Name="ControlsPanel"
@@ -726,16 +726,12 @@
                         <uc:RiseMediaPlayerElement.TransportControls>
                             <uc:RiseMediaTransportControls
                                 x:Name="PlayerControls"
-                                ui:Effects.Shadow="{StaticResource LightDropShadow}"
+                                ext:Effects.Shadow="{StaticResource LightDropShadow}"
                                 AddToPlaylistCommand="{x:Bind AddToPlaylistCommand}"
                                 DisplayItemVisibility="Visible"
                                 FullWindowCommand="{x:Bind EnterFullScreenCommand}"
-                                IsCompactOverlayButtonVisible="True"
-                                IsCompactOverlayEnabled="True"
                                 IsEqualizerButtonEnabled="True"
                                 IsEqualizerButtonVisible="True"
-                                IsFullWindowButtonVisible="True"
-                                IsFullWindowEnabled="True"
                                 IsNextTrackButtonVisible="True"
                                 IsPlaybackRateButtonVisible="True"
                                 IsPlaybackRateEnabled="True"

@@ -1,4 +1,4 @@
-﻿using Rise.App.Dialogs;
+using Rise.App.Dialogs;
 using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -13,7 +13,6 @@ namespace Rise.App.Views
         public SetupPage()
         {
             InitializeComponent();
-            TitleBar.SetTitleBarForCurrentView();
         }
 
         private async void SetupButton_Click(object sender, RoutedEventArgs e)

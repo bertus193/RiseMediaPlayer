@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -22,9 +22,9 @@ using Rise.Data.ViewModels;
 using Rise.NewRepository;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Graphics.Imaging;
 using Windows.Media;
 using Windows.Media.Playback;
 using Windows.UI;
@@ -95,9 +95,6 @@ namespace Rise.App.Views
             // WinUI 3: register AppTitleBar as the custom drag region through MainWindow
             App.MainAppWindow.SetTitleBarElement(AppTitleBar);
 
-            // Title bar layout is driven by AppWindow.TitleBar.RightInset
-            App.MainAppWindow.AppWindow.TitleBar.Changed += AppTitleBar_Changed;
-
             UpdateTitleBarLayout();
 
             var date = DateTime.Now;
@@ -161,8 +158,6 @@ namespace Rise.App.Views
 
         private void OnPageUnloaded(object sender, RoutedEventArgs e)
         {
-            App.MainAppWindow.AppWindow.TitleBar.Changed -= AppTitleBar_Changed;
-
             MViewModel.IndexingStarted -= MViewModel_IndexingStarted;
             MViewModel.IndexingFinished -= MViewModel_IndexingFinished;
             MViewModel.MetadataFetchingStarted -= MViewModel_MetadataFetchingStarted;
@@ -406,15 +401,16 @@ namespace Rise.App.Views
                     using var stream = await MPViewModel
                         .PlayingItemProperties.Thumbnail.OpenReadAsync();
 
-                    var decoder = await BitmapDecoder.CreateAsync(stream);
+                    using var netStream = stream.AsStreamForRead();
+                    using var bitmap = new System.Drawing.Bitmap(netStream);
                     var colorThief = new ColorThiefDotNet.ColorThief();
 
-                    var stolen = (await colorThief.GetColor(decoder)).Color;
+                    var stolen = colorThief.GetColor(bitmap).Color;
                     SViewModel.GlazeColors = Color.FromArgb(25, stolen.R, stolen.G, stolen.B);
                 }
                 else
                 {
-                    SViewModel.GlazeColors = Colors.Transparent;
+                    SViewModel.GlazeColors = Microsoft.UI.Colors.Transparent;
                 }
             }
         }

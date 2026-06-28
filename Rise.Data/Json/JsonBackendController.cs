@@ -44,10 +44,10 @@ namespace Rise.Data.Json
                 var cached = _controllers[filename];
                 if (cached is JsonBackendController<T> ctrl)
                     return ctrl;
-                throw new InvalidOperationException("The cached instance of this controller uses a different type.");
+                throw new System.InvalidOperationException("The cached instance of this controller uses a different type.");
             }
 
-            var file = dataFolder.CreateFileAsync($"{filename}.json", CreationCollisionOption.OpenIfExists).Get();
+            var file = AsyncExtensions.Get(dataFolder.CreateFileAsync($"{filename}.json", CreationCollisionOption.OpenIfExists));
             var controller = new JsonBackendController<T>(file);
 
             var items = controller.GetStoredItems();
@@ -98,7 +98,7 @@ namespace Rise.Data.Json
         /// </summary>
         public IEnumerable<T> GetStoredItems()
         {
-            var text = FileIO.ReadTextAsync(BackingFile).Get();
+            var text = AsyncExtensions.Get(FileIO.ReadTextAsync(BackingFile));
             if (!string.IsNullOrWhiteSpace(text))
                 return JsonConvert.DeserializeObject<IEnumerable<T>>(text);
 
@@ -125,7 +125,7 @@ namespace Rise.Data.Json
             Semaphore.Wait();
 
             string json = JsonConvert.SerializeObject(Items);
-            FileIO.WriteTextAsync(BackingFile, json).Get();
+            AsyncExtensions.Get(FileIO.WriteTextAsync(BackingFile, json));
 
             _ = Semaphore.Release();
         }

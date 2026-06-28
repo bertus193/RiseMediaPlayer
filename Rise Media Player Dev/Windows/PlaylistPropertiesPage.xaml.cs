@@ -1,4 +1,4 @@
-﻿using Rise.App.ViewModels;
+using Rise.App.ViewModels;
 using Rise.Common.Extensions;
 using Rise.Data.Json;
 using System;
@@ -23,11 +23,7 @@ namespace Rise.App.Views
         public PlaylistPropertiesPage()
         {
             InitializeComponent();
-            
-
-            TitleBar.SetTitleBarForCurrentView();
             Controller.Items.CollectionChanged += OnPlaylistCollectionChanged;
-            View.Consolidated += OnViewConsolidated;
         }
 
         public static Task<bool> TryShowAsync(PlaylistViewModel playlist)
@@ -38,12 +34,21 @@ namespace Rise.App.Views
             Playlist = e.Parameter as PlaylistViewModel;
         }
 
+        private static void CloseCurrentWindow(Microsoft.UI.Xaml.XamlRoot xamlRoot)
+        {
+            if (xamlRoot?.Content is Microsoft.UI.Xaml.FrameworkElement fe)
+            {
+                var window = Microsoft.UI.Xaml.Window.Current;
+                window?.Close();
+            }
+        }
+
         private async void OnPlaylistCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 Controller.Items.CollectionChanged -= OnPlaylistCollectionChanged;
-                await View.TryConsolidateAsync();
+                CloseCurrentWindow(XamlRoot);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
@@ -51,7 +56,7 @@ namespace Rise.App.Views
                 if (hasRemoved)
                 {
                     Controller.Items.CollectionChanged -= OnPlaylistCollectionChanged;
-                    await View.TryConsolidateAsync();
+                    CloseCurrentWindow(XamlRoot);
                 }
             }
         }
@@ -74,15 +79,14 @@ namespace Rise.App.Views
                 Controller.Items.Add(item);
             }
 
-            await View.TryConsolidateAsync();
+            CloseCurrentWindow(XamlRoot);
             await Controller.SaveAsync();
         }
 
-        private void OnWindowClosed(object sender, WindowEventArgs args)
+        private async void OnWindowClosed(object sender, WindowEventArgs args)
         {
-            View.Consolidated -= OnViewConsolidated;
-            if (args.IsUserInitiated)
-                await Controller.SaveAsync();
+            Controller.Items.CollectionChanged -= OnPlaylistCollectionChanged;
+            await Controller.SaveAsync();
         }
 
         private void NavigationView_SelectionChanged(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewSelectionChangedEventArgs args)

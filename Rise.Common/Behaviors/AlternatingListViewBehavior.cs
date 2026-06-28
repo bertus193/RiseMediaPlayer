@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.WinUI.UI;
+﻿using CommunityToolkit.WinUI;
 using Microsoft.Xaml.Interactivity;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;

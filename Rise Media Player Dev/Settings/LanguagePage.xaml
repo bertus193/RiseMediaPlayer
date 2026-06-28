@@ -1,14 +1,14 @@
-﻿<Page
+<Page
     x:Class="Rise.App.Settings.LanguagePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:labs="using:CommunityToolkit.Labs.WinUI"
+    xmlns:labs="using:CommunityToolkit.WinUI.Controls"
     xmlns:markup="using:Rise.Common.Extensions.Markup"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:uc="using:Rise.App.UserControls"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
 
     <ScrollViewer Padding="48,4,48,0" VerticalScrollBarVisibility="Auto">
@@ -100,22 +100,22 @@
                     PlaceholderText="Use system language"
                     SelectedIndex="{x:Bind ViewModel.Language, Mode=TwoWay}">
                     <x:String>Use system setting</x:String>
-                    <x:String>中国人</x:String>
-                    <x:String>हिंदी</x:String>
-                    <x:String>한국인</x:String>
-                    <x:String>Ελληνικά</x:String>
+                    <x:String>???</x:String>
+                    <x:String>?????</x:String>
+                    <x:String>???</x:String>
+                    <x:String>????????</x:String>
                     <x:String>Deutsch</x:String>
                     <x:String>English</x:String>
                     <x:String>English (United Kingdom)</x:String>
                     <x:String>English (United States)</x:String>
-                    <x:String>Español</x:String>
-                    <x:String>Français</x:String>
+                    <x:String>Espa�ol</x:String>
+                    <x:String>Fran�ais</x:String>
                     <x:String>Italiano</x:String>
                     <x:String>Melayu</x:String>
                     <x:String>Polskie</x:String>
-                    <x:String>Português (Brasil)</x:String>
-                    <x:String>Português (Portugal)</x:String>
-                    <x:String>Română</x:String>
+                    <x:String>Portugu�s (Brasil)</x:String>
+                    <x:String>Portugu�s (Portugal)</x:String>
+                    <x:String>Rom�na</x:String>
                 </ComboBox>
             </labs:SettingsCard>
         </StackPanel>

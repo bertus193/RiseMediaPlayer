@@ -1,4 +1,4 @@
-﻿using Rise.App.ViewModels;
+using Rise.App.ViewModels;
 using Rise.Common.Extensions;
 using System;
 using System.Threading.Tasks;
@@ -16,7 +16,6 @@ namespace Rise.App.Views
         public SongPropertiesPage()
         {
             InitializeComponent();
-            TitleBar.SetTitleBarForCurrentView();
         }
 
         public static Task<bool> TryShowAsync(SongPropertiesViewModel props)

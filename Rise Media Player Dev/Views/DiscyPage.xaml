@@ -1,15 +1,15 @@
-ï»¿<Page
+<Page
     x:Class="Rise.App.Views.DiscyPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:markup="using:Rise.Common.Extensions.Markup"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:media="using:CommunityToolkit.WinUI.UI.Media"
+    xmlns:media="using:CommunityToolkit.WinUI.Media"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:uc="using:Rise.App.UserControls"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI"
-    xmlns:labs="using:CommunityToolkit.Labs.WinUI"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:labs="using:CommunityToolkit.WinUI.Controls"
     d:Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     d:Height="320"
     d:Width="500"
@@ -43,7 +43,7 @@
                                 <Paragraph>
                                     To add your personal music and videos, go to
                                     <Hyperlink Click="AppSettingsHyperlink_Click" UnderlineStyle="None">app settings</Hyperlink>
-                                    and go to the library page. Click on the button that corresponds to the type of media you want to add (music or videos). Then click â€˜Add folderâ€™ to select from your files. If you add a root folder, weâ€™ll look in all of the folders within, so thereâ€™s no need to add many folders. Weâ€™ll automatically rescan your music and videos to match your new locations. Youâ€™re done!
+                                    and go to the library page. Click on the button that corresponds to the type of media you want to add (music or videos). Then click ‘Add folder’ to select from your files. If you add a root folder, we’ll look in all of the folders within, so there’s no need to add many folders. We’ll automatically rescan your music and videos to match your new locations. You’re done!
                                 </Paragraph>
                             </RichTextBlock>
                         </labs:SettingsCard.Header>
@@ -57,10 +57,10 @@
                         <labs:SettingsCard.Header>
                             <RichTextBlock TextWrapping="Wrap" HorizontalAlignment="Stretch" IsTextSelectionEnabled="False">
                                 <Paragraph>
-                                    From several pages, you can sort through your music and videos. Choose the sort option from the command bar and select what seems most appropriate to you. You can sort in ascending and descending order too, so thereâ€™s something for everybody!
+                                    From several pages, you can sort through your music and videos. Choose the sort option from the command bar and select what seems most appropriate to you. You can sort in ascending and descending order too, so there’s something for everybody!
                                 </Paragraph>
                                 <Paragraph Margin="0,12,0,0">
-                                    You can also manage your library by editing properties of albums, songs or videos. To do this, right click one and choose â€˜Properties and Infoâ€™. There you can edit titles, ratings, file names and more to simplify your library and fix metadataâ€™s issues. Soon youâ€™ll be able to change album art too!
+                                    You can also manage your library by editing properties of albums, songs or videos. To do this, right click one and choose ‘Properties and Info’. There you can edit titles, ratings, file names and more to simplify your library and fix metadata’s issues. Soon you’ll be able to change album art too!
                                 </Paragraph>
                             </RichTextBlock>
                         </labs:SettingsCard.Header>
@@ -74,11 +74,11 @@
                         <labs:SettingsCard.Header>
                             <RichTextBlock TextWrapping="Wrap" HorizontalAlignment="Stretch" IsTextSelectionEnabled="False">
                                 <Paragraph>
-                                    Itâ€™s easy to play any media you wish. Just hover over any song, album, artist, playlist, genre or video and click the play button! It will appear in the now playing bar.
+                                    It’s easy to play any media you wish. Just hover over any song, album, artist, playlist, genre or video and click the play button! It will appear in the now playing bar.
                                 </Paragraph>
 
                                 <Paragraph Margin="0,12,0,0">
-                                    The now playing bar gives you quick information about whatâ€™s, playing as well as simple playback controls and links to full screen mode and the now playing compact mode.
+                                    The now playing bar gives you quick information about what’s, playing as well as simple playback controls and links to full screen mode and the now playing compact mode.
                                 </Paragraph>
 
                                 <Paragraph Margin="0,12,0,0">
@@ -120,7 +120,7 @@
                     IsTextSelectionEnabled="False"
                     TextAlignment="Center">
                     <Paragraph>
-                        Weâ€™re adding extra help all of the time! You can always <Hyperlink NavigateUri="https://rise-media.netlify.app/help" UnderlineStyle="None">get more help online</Hyperlink>
+                        We’re adding extra help all of the time! You can always <Hyperlink NavigateUri="https://rise-media.netlify.app/help" UnderlineStyle="None">get more help online</Hyperlink>
                         if you need more support, or click on Discy!
                     </Paragraph>
                 </RichTextBlock>

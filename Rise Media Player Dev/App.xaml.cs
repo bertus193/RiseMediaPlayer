@@ -1,5 +1,3 @@
-using CommunityToolkit.WinUI.Notifications;
-using Microsoft.QueryStringDotNET;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
@@ -22,10 +20,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
-using Windows.ApplicationModel.Activation;
 using Windows.Storage;
 using Windows.UI;
-using Windows.UI.Notifications;
 using WinRT.Interop;
 
 namespace Rise.App
@@ -78,7 +74,7 @@ namespace Rise.App
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
         }
 
-        protected override async void OnLaunched(LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             MainAppWindow = new MainWindow();
             await ActivateAsync(false);
@@ -147,7 +143,7 @@ namespace Rise.App
 
         private static StorageLibrary OnStorageLibraryRequested(KnownLibraryId id)
         {
-            var library = StorageLibrary.GetLibraryAsync(id).Get();
+            var library = Rise.Common.Extensions.AsyncExtensions.Get(StorageLibrary.GetLibraryAsync(id));
             library.ChangeTracker.Enable();
             return library;
         }
@@ -212,21 +208,6 @@ namespace Rise.App
         private void ShowExceptionToast(Exception e)
         {
             string notifTitle = ResourceHelper.GetString("ErrorOcurred");
-            ToastContent content = new ToastContentBuilder()
-                .AddToastActivationInfo(new QueryString()
-                {
-                     { "stackTrace", e.StackTrace },
-                     { "message", e.Message },
-                     { "exceptionName", e.GetType().ToString() },
-                     { "source", e.Source },
-                     { "hresult", $"{e.HResult}" }
-                }.ToString(), ToastActivationType.Foreground)
-                .AddText(notifTitle)
-                .AddText(ResourceHelper.GetString("CrashStackTrace"))
-                .GetToastContent();
-
-            ToastNotification notification = new(content.GetXml());
-            ToastNotificationManager.CreateToastNotifier().Show(notification);
 
             var builder = new StringBuilder();
             builder.Append(ResourceHelper.GetString("CrashDetails"));

@@ -1,4 +1,4 @@
-﻿using Rise.App.ViewModels;
+using Rise.App.ViewModels;
 using Rise.Common.Extensions;
 using Rise.Models;
 using Rise.NewRepository;
@@ -19,7 +19,6 @@ namespace Rise.App.Views.Albums.Properties
         public AlbumPropertiesPage()
         {
             InitializeComponent();
-            TitleBar.SetTitleBarForCurrentView();
         }
 
         public static Task<bool> TryShowAsync(AlbumViewModel album)

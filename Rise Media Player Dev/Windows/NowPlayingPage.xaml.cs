@@ -1,5 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI;
 using Rise.App.Helpers;
 using Rise.App.UserControls;
 using Rise.App.ViewModels;
@@ -13,7 +13,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media;
 using Windows.Media.Playback;
-using Windows.UI.ViewManagement;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -43,7 +42,6 @@ namespace Rise.App.Views
         public NowPlayingPage()
         {
             InitializeComponent();
-            TitleBar.SetTitleBarForCurrentView();
         }
 
         private void OnPageLoaded(object sender, RoutedEventArgs e)
@@ -146,12 +144,10 @@ namespace Rise.App.Views
         [RelayCommand]
         private void ToggleFullScreen()
         {
-            // WinUI 3: full screen state via AppWindow
-
             if (App.MainAppWindow.IsFullScreen)
-                view.ExitFullScreenMode();
+                App.MainAppWindow.ExitFullScreen();
             else
-                _ = view.TryEnterFullScreenMode();
+                App.MainAppWindow.EnterFullScreen();
         }
 
         private async void OnLyricsListLoaded(object sender, RoutedEventArgs e)
